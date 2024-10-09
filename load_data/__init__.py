@@ -1,5 +1,21 @@
 from google.cloud import bigquery
 import os
+from datetime import datetime
+from flask_caching import Cache
+import logging
+
+from app_initialization import app, server
+
+# Initialize logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Set up cache
+cache = Cache(server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory',  # Ensure this directory exists and is writable
+    'CACHE_DEFAULT_TIMEOUT': 86400  # Cache timeout in seconds (24 hours)
+})
 
 # Set Google Cloud credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "tokens/gcp_token.json"
@@ -74,3 +90,20 @@ def load_speech_summary():
     """)
     result = job.result()
     return result.to_dataframe()
+
+# Data fetching function
+def get_data():
+    data = cache.get('all_data')
+    if data is not None:
+        logger.debug(f"{datetime.now()} - Data fetched from cache")
+        return data
+    else:
+        logger.debug(f"{datetime.now()} - Data fetched from BigQuery")
+        speech_agg_df = load_speech_agg()
+        speech_summary_df = load_speech_summary()
+        data = {
+            'speech_agg': speech_agg_df,
+            'speech_summaries': speech_summary_df
+        }
+        cache.set('all_data', data, timeout=86400)
+        return data
