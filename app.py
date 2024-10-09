@@ -6,8 +6,9 @@ from datetime import datetime
 from flask_caching import Cache
 import logging
 
-from utils import PARTY_COLOURS
+from utils import PARTY_COLOURS, parliaments, parliament_sessions
 from load_data import load_speech_agg, load_speech_summary
+from pages.home import *
 
 # Initialize logging
 logging.basicConfig(level=logging.DEBUG)
@@ -41,54 +42,8 @@ def get_data():
         cache.set('all_data', data, timeout=86400)
         return data
 
-# Define parliaments
-parliaments = {
-    "12th (2011-2015)": '12',
-    "13th (2016-2020)": '13',
-    "14th (2020-present)": '14',
-    "All": 'All'
-}
-
-parliament_sessions = sorted(parliaments.keys(), reverse=True)
-
-# Navbar
-navbar = dbc.Navbar(
-    [
-        dbc.Button(html.Span(className="navbar-toggler-icon"), color="primary", className="me-2 d-md-none",
-                   id="sidebar-toggle", n_clicks=0),
-        dbc.NavbarBrand("Parliamentary Analysis", className="ms-2"),
-    ],
-    color="light",
-    dark=False,
-    sticky="top",
-)
-
-# Sidebar content
-sidebar_content = [
-    dbc.Nav(
-        [
-            dbc.NavLink("Parleh-mate", href="/", active="exact"),
-            dbc.NavLink("Speeches", href="/speeches", active="exact"),
-            # Removed Page 2 Link
-        ],
-        vertical=True,
-        pills=True,
-    ),
-]
-
-# Sidebar
-sidebar = html.Div(sidebar_content, id="sidebar", className="sidebar d-none d-md-block")
-
 # Offcanvas for mobile
 offcanvas = dbc.Offcanvas(sidebar_content, id="offcanvas", is_open=False, title="Menu", placement="start")
-
-# Home page layout
-home_page = html.Div(
-    [
-        html.H1("Welcome to the Parliamentary Analysis App"),
-        html.P("Explore parliamentary speeches and topics."),
-    ]
-)
 
 # Page 1 layout with dropdowns, graph, and table
 def page_1_layout():
