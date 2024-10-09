@@ -1,0 +1,6 @@
+dash
+pandas
+plotly-express
+google-cloud-bigquery
+google-cloud-bigquery-storage
+Flask-Caching

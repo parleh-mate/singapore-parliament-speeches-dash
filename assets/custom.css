@@ -1,0 +1,24 @@
+/* custom.css */
+
+/* Adjust content padding when sidebar is hidden (mobile view) */
+@media screen and (max-width: 767px) {
+    .content {
+        padding: 1rem;
+    }
+}
+
+/* Set sidebar width and content margin for desktop view */
+@media screen and (min-width: 768px) {
+    .sidebar {
+        position: sticky;
+        top: 56px; /* Height of the navbar */
+        height: calc(100vh - 56px);
+        padding: 1rem;
+        background-color: #f8f9fa;
+        overflow-y: auto;
+    }
+    .content {
+        padding: 1rem;
+        margin-top: 56px; /* Height of the navbar */
+    }
+}
