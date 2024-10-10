@@ -28,8 +28,8 @@
 /* Custom Navbar Class with Blur Effect */
 .custom-navbar {
     background-color: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(5px); /* Adds a blur to the background */
-    -webkit-backdrop-filter: blur(5px); /* For Safari support */
+    backdrop-filter: blur(10px); /* Adds a blur to the background */
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
     height: 56px;
     padding: 10px 20px;
 }
