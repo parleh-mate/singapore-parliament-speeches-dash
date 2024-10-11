@@ -202,9 +202,11 @@ def speeches_callbacks(app):
         speech_agg_df = get_data()['speech_agg']
         speech_summary_df = get_data()['speech_summaries']
 
-        # Filter by parliament
-        speech_summary_df = speech_summary_df[speech_summary_df['parliament'] == parliaments[selected_parliament]]        
+        # Filter by parliament        
         speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
+
+        if selected_parliament != 'All' and selected_parliament:
+            speech_summary_df = speech_summary_df[speech_summary_df['parliament'] == int(parliaments[selected_parliament])]
         
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
