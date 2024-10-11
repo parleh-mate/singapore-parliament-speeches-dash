@@ -207,7 +207,7 @@ def participation_callbacks(app):
         # Further filter based on selected_member
         if selected_member != 'All' and selected_member:
             participation_df = participation_df[participation_df['member_name'] == selected_member]
-        
+
         # Create the scatter plot
         fig = px.scatter(
             participation_df,

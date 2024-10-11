@@ -118,9 +118,12 @@ def load_participation():
 
 def load_demographics():
     job = gbq_client.query("""
-                    SELECT member_name, parliament, member_ethnicity, party, gender, extract(year from current_date()) - member_birth_year as age_this_year
+                    SELECT member_name, parliament, party, member_constituency, member_ethnicity, gender, member_birth_year, extract(year from first_parl_date) - member_birth_year as year_age_entered
                     FROM `singapore-parliament-speeches.prod_dim.dim_members`
-                    left join (select distinct member_name, parliament from `singapore-parliament-speeches.prod_agg.agg_speech_metrics_by_member`)
+                    left join (SELECT member_name, parliament, member_constituency, min(`date`) as first_parl_date
+                        FROM `singapore-parliament-speeches.prod_mart.mart_attendance`
+                        where member_constituency is not null
+                        group by member_name, parliament, member_constituency)
                     using (member_name)
                     order by member_name, parliament
 """)

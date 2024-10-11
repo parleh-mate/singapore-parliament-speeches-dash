@@ -6,6 +6,7 @@ from load_data import app
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.participation import participation_callbacks, participation_layout
+from pages.demographics import demographics_callbacks, demographics_layout
 
 # Offcanvas for mobile
 offcanvas = dbc.Offcanvas(
@@ -34,6 +35,8 @@ app.layout = html.Div([
                 # Participation Page Div
                 html.Div(id='participation', children=participation_layout(), style={'display': 'none'}),
 
+                html.Div(id='demographics', children=demographics_layout(), style={'display': 'none'}),
+
                 # 404 Page Div
                 html.Div(
                     id='404-page',
@@ -53,6 +56,7 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home', 'style'),
                 "participation": Output('participation', 'style'),
                 "speeches": Output('speeches', 'style'),
+                "demographics": Output('demographics', 'style'),
                 "404": Output('404-page', 'style')}
 
 # Callback to control page visibility
@@ -87,9 +91,11 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
             return False
     return is_open
 
-# Register Speeches and Participation callbacks
-speeches_callbacks(app)
+# Register callbacks; must be in correct order!
+
 participation_callbacks(app)
+speeches_callbacks(app)
+demographics_callbacks(app)
 
 # Run the app
 if __name__ == "__main__":
