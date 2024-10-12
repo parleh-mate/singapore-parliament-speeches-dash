@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+from scipy.stats import gaussian_kde
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
 from load_data import get_data
@@ -42,7 +43,7 @@ def demographics_layout():
                         config={"responsive": True},
                         style={'minHeight': '500px'}
                     )
-                ], width=6),
+                ], xs=12, md=6, className="mb-4"),
 
                 dbc.Col([
                     dcc.Graph(
@@ -50,7 +51,7 @@ def demographics_layout():
                         config={"responsive": True},
                         style={'minHeight': '500px'}
                     )
-                ], width=6)
+                ], xs=12, md=6, className="mb-4")
             ]),
         ],
         className='content'
@@ -75,7 +76,6 @@ def demographics_callbacks(app):
             demographics_df,
             x='year_age_entered',
             color='party', 
-            title='Age at year of first sitting',
             opacity=0.75,
             histnorm='probability',
             color_discrete_map=PARTY_COLOURS,
@@ -85,16 +85,12 @@ def demographics_callbacks(app):
         # Set the size of each bin to 5
         age_histogram.update_traces(xbins=dict(size=5))
 
-        # Adjust the y-axis title
-        age_histogram.update_yaxes(title_text="Proportion")
-
         # Find the minimum and maximum multiples of 5 for tick marks
         min_tick = (np.floor(demographics_df['year_age_entered'].min() / 5) * 5)-5
         max_tick = (np.ceil(demographics_df['year_age_entered'].max() / 5) * 5)+5
 
         # Create tick values, but exclude the first one (to avoid overlapping with 0)
-        tickvals = np.arange(min_tick, max_tick + 1, 5)
-        tickvals = tickvals[tickvals != min_tick]  # Remove the first tick to prevent it from overlapping with 0
+        tickvals = [i for i in np.arange(min_tick, max_tick + 1, 5) if i!=min_tick]
 
         # Adjust the x-axis to show ticks in increments of 5, but skip the first one
         age_histogram.update_xaxes(title_text="Year-age at first sitting",
@@ -102,6 +98,135 @@ def demographics_callbacks(app):
                                    dtick=5, 
                                    tickvals=tickvals, 
                                    range=[min_tick, max_tick])
+        
+        age_histogram.update_layout(legend=dict(
+                                        title=dict(text='Party'),
+                                        yanchor="top",
+                                        y=0.99,
+                                        xanchor="left",
+                                        x=0.01
+                                        ))
+
+        age_histogram.update_traces(
+            hovertemplate="<b>Year Age Entered:</b> %{x}<br>" +
+            "<b>Proportion:</b> %{y:.2f}<extra></extra>"
+            )
+
+        # now the density plot                
+
+        age_density = go.Figure()
+
+        # Loop through each party and calculate KDE
+        for party in demographics_df['party'].unique():
+            # Filter the data for each party
+            party_data = demographics_df[demographics_df['party'] == party]['year_age_entered']
+            
+            # Calculate KDE with custom bandwidth
+            kde = gaussian_kde(party_data, bw_method=0.2)
+            
+            # Extend the x range slightly beyond the min and max to allow smooth tails
+            x_min = np.max([party_data.min() - 5, 20])
+            x_max = np.min([party_data.max() + 5, 100])
+            x_range = np.linspace(x_min, x_max, 1000)
+            
+            # Evaluate KDE
+            kde_values = kde(x_range)
+            
+            # Add filled density curve to plot
+            age_density.add_trace(go.Scatter(
+                x=x_range, 
+                y=kde_values,
+                mode='lines',
+                name=party,
+                line=dict(color=PARTY_COLOURS[party], width=2),
+                fill='tozeroy',  # Fill the area under the curve
+                hovertemplate="<b>Age:</b> %{x:.0f}<br>" +
+                              "<b>Density:</b> %{y:.2f}<br>" + 
+                              f"<b>Party:</b> {party}<extra></extra>"
+            ))
+        
+        # now combine histogram and density plots
+
+        # Initialize a new figure
+        combined_fig = go.Figure()
+
+        # Add histogram traces
+        for trace in age_histogram.data:
+            combined_fig.add_trace(trace)
+
+        # Add KDE traces
+        for trace in age_density.data:
+            combined_fig.add_trace(trace)
+
+        # Determine the number of traces for each plot
+        num_hist_traces = len(age_histogram.data)
+        num_kde_traces = len(age_density.data)
+
+        # Create buttons
+        buttons = [
+            dict(
+                label="Proportion",
+                method="update",
+                args=[
+                    {"visible": [True]*num_hist_traces + [False]*num_kde_traces},
+                    {
+                        "title": "Age at Year of First Sitting",
+                        "xaxis": {"title": "Year-age at first sitting"},
+                        "yaxis": {"title": "Proportion"}
+                    }
+                ]
+            ),
+            dict(
+                label="Density",
+                method="update",
+                args=[
+                    {"visible": [False]*num_hist_traces + [True]*num_kde_traces},
+                    {
+                        "title": "Age at Year of First Sitting",
+                        "xaxis": {"title": "Year-age at first sitting"},
+                        "yaxis": {"title": "Density"}
+                    }
+                ]
+            )
+        ]
+
+        # Update the layout with buttons
+        combined_fig.update_layout(
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    direction="left",
+                    buttons=buttons,
+                    pad={"r": 10, "t": 10},
+                    showactive=True,
+                    x=0.99,
+                    xanchor="right",
+                    y=1.2,
+                    yanchor="top"
+                )
+            ]
+        )
+
+        # Set initial visibility (e.g., show histogram by default)
+        for i in range(num_hist_traces):
+            combined_fig.data[i].visible = True
+        for i in range(num_kde_traces):
+            combined_fig.data[num_hist_traces + i].visible = False
+
+        # Optionally, update axes and layout as needed
+        combined_fig.update_layout(
+            xaxis_title="Year-age at first sitting",
+            yaxis_title="Proportion",
+            title="Age at Year of First Sitting",
+            margin=dict(l=0, r=0),
+            legend=dict(
+                title=dict(text='Party'),
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=0.01
+            )
+        )
 
         # ethnicity and gender graph
 
@@ -141,10 +266,10 @@ def demographics_callbacks(app):
                     hovertext=ethnicity_df['gender'],  # Display gender info in hover
                     marker_pattern_shape=pattern,  # Apply the pattern based on gender
                     marker_color=PARTY_COLOURS[party],  # Use the custom color for the party
-                    hovertemplate="Ethnicity: %{x[0]}<br>" +
-                                "Party: %{x[1]}<br>" +
-                                "Proportion: %{y}<br>" +
-                                "Gender: %{hovertext}<extra></extra>"
+                    hovertemplate="<b>Ethnicity:</b> %{x[0]}<br>" +
+                                "<b>Party:</b> %{x[1]}<br>" +
+                                "<b>Proportion:</b> %{y:.2f}<br>" +
+                                "<b>Gender:</b> %{hovertext}<extra></extra>"
                 )
 
         # Final layout adjustments
@@ -154,6 +279,7 @@ def demographics_callbacks(app):
             xaxis_title='Ethnicity',
             yaxis_title='Proportion',
             showlegend=True,
+            margin=dict(l=0, r=0),
             legend=dict(
                 title=dict(text='Party - Gender'),
                 yanchor="top",
@@ -163,4 +289,4 @@ def demographics_callbacks(app):
             )
         )       
         
-        return age_histogram, ethnicity_fig
+        return combined_fig, ethnicity_fig
