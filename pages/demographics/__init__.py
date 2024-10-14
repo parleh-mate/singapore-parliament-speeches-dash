@@ -8,7 +8,6 @@ import numpy as np
 from scipy.stats import gaussian_kde, norm
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
-from load_data import get_data
 
 parliaments_demo = {i:v for i,v in parliaments.items() if i!='All'}
 
@@ -57,7 +56,7 @@ def demographics_layout():
         className='content'
     )
 
-def demographics_callbacks(app):
+def demographics_callbacks(app, data):
     # Callback to update the demographics graph and table on Page 1
     @app.callback(
         [Output('demographics-age-graph', 'figure'),
@@ -65,7 +64,7 @@ def demographics_callbacks(app):
         Input('parliament-dropdown-demographics', 'value')
     )
     def update_graph_and_table(selected_parliament):
-        demographics_df = get_data()['demographics']
+        demographics_df = data['demographics']
 
         # Filter by parliament
         demographics_df = demographics_df[demographics_df['parliament'] == int(parliaments_demo[selected_parliament])]    
