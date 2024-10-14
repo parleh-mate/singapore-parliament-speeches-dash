@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
-from load_data import get_data
 
 # speeches layout with dropdowns, graph, and table
 def speeches_layout():
@@ -139,7 +138,7 @@ def speeches_layout():
     )
 
 
-def speeches_callbacks(app):
+def speeches_callbacks(app, data):
     # Callback to control visibility of the Constituency dropdown
     @app.callback(
         Output('constituency-dropdown-container', 'style'),
@@ -161,7 +160,7 @@ def speeches_callbacks(app):
         if selected_parliament == 'All':
             # If 'All' is selected, reset options to include only 'All'
             return [{'label': 'All', 'value': 'All'}], 'All'
-        speech_agg_df = get_data()['speech_agg']
+        speech_agg_df = data['speech_agg']
         # Filter the dataframe based on the selected parliament session
         speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
         # Get unique constituencies
@@ -178,7 +177,7 @@ def speeches_callbacks(app):
         Input('constituency-dropdown', 'value')]
     )
     def update_member_options(selected_parliament, selected_constituency):
-        speech_agg_df = get_data()['speech_agg']
+        speech_agg_df = data['speech_agg']
         # Start with filtering by parliament session
         speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
         # Further filter by constituency if not 'All'
@@ -199,8 +198,8 @@ def speeches_callbacks(app):
         Input('member-dropdown', 'value')]
     )
     def update_graph_and_table(selected_parliament, selected_constituency, selected_member):
-        speech_agg_df = get_data()['speech_agg']
-        speech_summary_df = get_data()['speech_summaries']
+        speech_agg_df = data['speech_agg']
+        speech_summary_df = data['speech_summaries']
 
         # Filter by parliament        
         speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
@@ -235,7 +234,14 @@ def speeches_callbacks(app):
             title=f'Speeches vs. Questions per Sitting - Parliament {selected_parliament}',
             color_discrete_map=PARTY_COLOURS
         )
-        fig.update_layout(transition_duration=500)
+        fig.update_layout(transition_duration=500,
+                          legend=dict(
+                              title=dict(text='Party'),
+                              yanchor="top",
+                              y=0.99,
+                              xanchor="right",
+                              x=0.99
+                              ))
         
         # Prepare table data
         table_data = speech_summary_df.to_dict('records')

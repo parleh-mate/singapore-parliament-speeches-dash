@@ -1,6 +1,13 @@
 dash
+dash-iconify
 pandas
 plotly-express
 google-cloud-bigquery
 google-cloud-bigquery-storage
 Flask-Caching
+gunicorn
+numpy
+plotly
+dash_bootstrap_components
+scipy
+db-dtypes

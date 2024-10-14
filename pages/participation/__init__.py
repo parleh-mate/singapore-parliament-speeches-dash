@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
-from load_data import get_data
 
 # participation layout with dropdowns, graph, and table
 def participation_layout():
@@ -133,7 +132,7 @@ def participation_layout():
         className='content'
     )
 
-def participation_callbacks(app):
+def participation_callbacks(app, data):
     # Callback to control visibility of the Constituency dropdown
     @app.callback(
         Output('constituency-dropdown-container-participation', 'style'),
@@ -155,7 +154,7 @@ def participation_callbacks(app):
         if selected_parliament == 'All':
             # If 'All' is selected, reset options to include only 'All'
             return [{'label': 'All', 'value': 'All'}], 'All'
-        participation_df = get_data()['participation']
+        participation_df = data['participation']
         
         # Filter the dataframe based on the selected parliament session
         participation_df = participation_df[participation_df['parliament'] == parliaments[selected_parliament]]
@@ -173,7 +172,7 @@ def participation_callbacks(app):
         Input('constituency-dropdown-participation', 'value')]
     )
     def update_member_options(selected_parliament, selected_constituency):
-        participation_df = get_data()['participation']
+        participation_df = data['participation']
         # Start with filtering by parliament session
         participation_df = participation_df[participation_df['parliament'] == parliaments[selected_parliament]]
 
@@ -195,7 +194,7 @@ def participation_callbacks(app):
         Input('member-dropdown-participation', 'value')]
     )
     def update_graph_and_table(selected_parliament, selected_constituency, selected_member):
-        participation_df = get_data()['participation']
+        participation_df = data['participation']
 
         # Filter by parliament
         participation_df = participation_df[participation_df['parliament'] == parliaments[selected_parliament]]
@@ -223,7 +222,14 @@ def participation_callbacks(app):
             title=f'Attendance vs Participation by member - Parliament {selected_parliament}',
             color_discrete_map=PARTY_COLOURS
         )
-        fig.update_layout(transition_duration=500)
+        fig.update_layout(transition_duration=500,
+                          legend=dict(
+                              title=dict(text='Party'),
+                              yanchor="top",
+                              y=0.99,
+                              xanchor="left",
+                              x=0.01
+                              ))
         
         # Prepare table data
         table_data = participation_df.to_dict('records')

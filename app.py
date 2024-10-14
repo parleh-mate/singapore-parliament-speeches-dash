@@ -1,12 +1,66 @@
-# app.py
 from dash import html, dcc, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
+import dash
+from flask_caching import Cache
+import logging
+import pytz
+from datetime import datetime
 
-from load_data import app
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.demographics import demographics_callbacks, demographics_layout
+
+from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics
+
+# Initialize the app
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX], suppress_callback_exceptions=True)
+server = app.server  # Expose the Flask app as a variable
+
+# Initialize logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# set time
+gmt_plus_8 = pytz.timezone('Asia/Singapore')
+
+# Set up cache
+cache = Cache(server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': '/tmp/cache-directory',  # Ensure this directory exists and is writable
+    'CACHE_TIME': datetime.now(gmt_plus_8) # Cache today's datetime
+})
+
+# Data fetching function
+def get_data():
+    data = cache.get('all_data')
+    time_loaded = cache.get('time_loaded')
+
+    current_time = datetime.now(gmt_plus_8)
+    # Create a datetime object for 1:00 AM today
+    today_1am = current_time.replace(hour=1, minute=0, second=0, microsecond=0)
+    # If current time is before 1:00 AM, go to the previous day's 1:00 AM
+    if current_time < today_1am:
+        previous_1am = today_1am - timedelta(days=1)
+    else:
+        previous_1am = today_1am   
+
+    if data is not None and time_loaded>previous_1am:
+        logger.debug(f"{datetime.now()} - Data fetched from cache")
+        return data
+    else:
+        logger.debug(f"{datetime.now()} - Data fetched from BigQuery")
+        data = {
+            'participation': load_participation(),
+            'speech_agg': load_speech_agg(),
+            'speech_summaries': load_speech_summary(),
+            'demographics': load_demographics()
+        }
+        cache.set('all_data', data)
+        cache.set('time_loaded', datetime.now(gmt_plus_8))
+        return data
+
+data = get_data()
 
 # Offcanvas for mobile
 offcanvas = dbc.Offcanvas(
@@ -93,9 +147,9 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 # Register callbacks; must be in correct order!
 
-participation_callbacks(app)
-speeches_callbacks(app)
-demographics_callbacks(app)
+participation_callbacks(app, data)
+speeches_callbacks(app, data)
+demographics_callbacks(app, data)
 
 # Run the app
 if __name__ == "__main__":
