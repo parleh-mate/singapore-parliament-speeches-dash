@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
-from scipy.stats import gaussian_kde
+from scipy.stats import gaussian_kde, norm
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
 from load_data import get_data
@@ -85,19 +85,8 @@ def demographics_callbacks(app):
         # Set the size of each bin to 5
         age_histogram.update_traces(xbins=dict(size=5))
 
-        # Find the minimum and maximum multiples of 5 for tick marks
-        min_tick = (np.floor(demographics_df['year_age_entered'].min() / 5) * 5)-5
-        max_tick = (np.ceil(demographics_df['year_age_entered'].max() / 5) * 5)+5
-
-        # Create tick values, but exclude the first one (to avoid overlapping with 0)
-        tickvals = [i for i in np.arange(min_tick, max_tick + 1, 5) if i!=min_tick]
-
         # Adjust the x-axis to show ticks in increments of 5, but skip the first one
-        age_histogram.update_xaxes(title_text="Year-age at first sitting",
-                                   tick0=min_tick, 
-                                   dtick=5, 
-                                   tickvals=tickvals, 
-                                   range=[min_tick, max_tick])
+        age_histogram.update_xaxes(title_text="Year-age at first sitting")
         
         age_histogram.update_layout(legend=dict(
                                         title=dict(text='Party'),
@@ -111,8 +100,8 @@ def demographics_callbacks(app):
             hovertemplate="<b>Year Age Entered:</b> %{x}<br>" +
             "<b>Proportion:</b> %{y:.2f}<extra></extra>"
             )
-
-        # now the density plot                
+        
+        # now the density plot 
 
         age_density = go.Figure()
 
@@ -120,17 +109,30 @@ def demographics_callbacks(app):
         for party in demographics_df['party'].unique():
             # Filter the data for each party
             party_data = demographics_df[demographics_df['party'] == party]['year_age_entered']
+            buffer = 15
+
+            if len(party_data)!=1:
             
-            # Calculate KDE with custom bandwidth
-            kde = gaussian_kde(party_data, bw_method=0.2)
-            
-            # Extend the x range slightly beyond the min and max to allow smooth tails
-            x_min = np.max([party_data.min() - 5, 20])
-            x_max = np.min([party_data.max() + 5, 100])
-            x_range = np.linspace(x_min, x_max, 1000)
-            
-            # Evaluate KDE
-            kde_values = kde(x_range)
+                # Calculate KDE with custom bandwidth
+                kde = gaussian_kde(party_data, bw_method=0.2)
+                
+                # Extend the x range slightly beyond the min and max to allow smooth tails
+                x_min = np.max([party_data.min() - buffer, 20])
+                x_max = np.min([party_data.max() + buffer, 100])
+                x_range = np.linspace(x_min, x_max, 1000)
+                
+                # Evaluate KDE
+                kde_values = kde(x_range)
+            else:                
+                # kde not possible with single value; use pdf and generate distribution
+                val = party_data.iloc[0]
+                std_dev = 2  # Adjust this value to control the spread of the peak
+
+                # Create x range for the "KDE-like" plot
+                x_range = np.linspace(np.max([val-buffer, 20]), np.min([val+buffer, 100]), 1000)  # A range around the single value
+
+                # Calculate the normal distribution (PDF) for the single value
+                kde_values = norm.pdf(x_range, loc=party_data, scale=std_dev)
             
             # Add filled density curve to plot
             age_density.add_trace(go.Scatter(
@@ -141,10 +143,9 @@ def demographics_callbacks(app):
                 line=dict(color=PARTY_COLOURS[party], width=2),
                 fill='tozeroy',  # Fill the area under the curve
                 hovertemplate="<b>Age:</b> %{x:.0f}<br>" +
-                              "<b>Density:</b> %{y:.2f}<br>" + 
                               f"<b>Party:</b> {party}<extra></extra>"
             ))
-        
+
         # now combine histogram and density plots
 
         # Initialize a new figure
@@ -162,6 +163,16 @@ def demographics_callbacks(app):
         num_hist_traces = len(age_histogram.data)
         num_kde_traces = len(age_density.data)
 
+        # axes tick marks
+
+        # Find the minimum and maximum multiples of 5 for tick marks
+        min_tick = (np.floor(demographics_df['year_age_entered'].min() / 5) * 5)-5
+        max_tick = (np.ceil(demographics_df['year_age_entered'].max() / 5) * 5)+5
+
+        # Create tick values, but exclude the first one (to avoid overlapping with 0)
+        tickvals = [i for i in np.arange(min_tick, max_tick + 1, 5) if i!=min_tick]
+
+
         # Create buttons
         buttons = [
             dict(
@@ -171,7 +182,12 @@ def demographics_callbacks(app):
                     {"visible": [True]*num_hist_traces + [False]*num_kde_traces},
                     {
                         "title": "Age at Year of First Sitting",
-                        "xaxis": {"title": "Year-age at first sitting"},
+                        "xaxis": {"title": "Year-age at first sitting",
+                                  "tick0": min_tick,
+                                  "dtick": 5,
+                                  "tickvals": tickvals,
+                                  "range": [min_tick, max_tick]
+                                  },
                         "yaxis": {"title": "Proportion"}
                     }
                 ]
@@ -183,8 +199,15 @@ def demographics_callbacks(app):
                     {"visible": [False]*num_hist_traces + [True]*num_kde_traces},
                     {
                         "title": "Age at Year of First Sitting",
-                        "xaxis": {"title": "Year-age at first sitting"},
-                        "yaxis": {"title": "Density"}
+                        "xaxis": {"title": "Year-age at first sitting",
+                                  "tick0": min_tick,
+                                  "dtick": 5,
+                                  "tickvals": tickvals,
+                                  "range": [min_tick, max_tick]
+                                  },
+                        "yaxis": {"title": "Density",
+                                  "ticks": "",
+                                  "showticklabels": False}
                     }
                 ]
             )
@@ -206,6 +229,13 @@ def demographics_callbacks(app):
                 )
             ]
         )
+
+        combined_fig.update_xaxes(
+            tick0=min_tick,
+            dtick=5,
+            tickvals=tickvals,
+            range=[min_tick, max_tick]
+            )
 
         # Set initial visibility (e.g., show histogram by default)
         for i in range(num_hist_traces):
