@@ -4,7 +4,7 @@ import dash
 from flask_caching import Cache
 import logging
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
