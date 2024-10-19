@@ -1,7 +1,6 @@
-import plotly.express as px
 from dash import html, dcc, Input, Output, dash_table
 import dash_bootstrap_components as dbc
-import plotly.express as px
+import plotly.graph_objects as go
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
 
@@ -201,6 +200,25 @@ def speeches_callbacks(app, data):
         speech_agg_df = data['speech_agg']
         speech_summary_df = data['speech_summaries']
 
+        # Define minimum and maximum marker sizes in pixels
+        SIZE_MIN = 5
+        SIZE_MAX = 40
+
+        # Calculate the global minimum and maximum of 'words_per_speech'
+        global_min = speech_agg_df['words_per_speech'].min()
+        global_max = speech_agg_df['words_per_speech'].max()
+
+        # Define a scaling function
+        def scale_marker_size(x, min_val, max_val, size_min, size_max):
+            if max_val == min_val:
+                return (size_min + size_max) / 2
+            else:
+                return size_min + (x - min_val) / (max_val - min_val) * (size_max - size_min)
+
+        speech_agg_df['marker_size'] = speech_agg_df['words_per_speech'].apply(
+            lambda x: scale_marker_size(x, global_min, global_max, SIZE_MIN, SIZE_MAX)
+        )
+
         # Filter by parliament        
         speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
 
@@ -209,39 +227,71 @@ def speeches_callbacks(app, data):
         
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
-            speech_agg_df = speech_agg_df[speech_agg_df['member_constituency'] == selected_constituency]
+            speech_agg_df_highlighted = speech_agg_df[speech_agg_df['member_constituency'] == selected_constituency]
             speech_summary_df = speech_summary_df[speech_summary_df['member_constituency'] == selected_constituency]
         
         # Further filter based on selected_member
         if selected_member != 'All' and selected_member:
-            speech_agg_df = speech_agg_df[speech_agg_df['member_name'] == selected_member]
+            speech_agg_df_highlighted = speech_agg_df_highlighted[speech_agg_df_highlighted['member_name'] == selected_member]
             speech_summary_df = speech_summary_df[speech_summary_df['member_name'] == selected_member]
+
+        if selected_constituency=='All' and selected_member=='All':
+            speech_agg_df_highlighted = speech_agg_df
+
+        speech_agg_df_non_highlighted = speech_agg_df.drop(speech_agg_df_highlighted.index)        
         
         # Create the scatter plot
-        fig = px.scatter(
-            speech_agg_df,
-            x='speeches_per_sitting',
-            y='questions_per_sitting',
-            color='member_party',
-            size='words_per_speech',  # Dynamically size based on words_per_speech
-            hover_data={
-                'member_name': True,
-                'member_party': True,
-                'speeches_per_sitting': ':.2f',
-                'questions_per_sitting': ':.2f',
-                'words_per_speech': True
-            },
-            title=f'Speeches vs. Questions per Sitting - Parliament {selected_parliament}',
-            color_discrete_map=PARTY_COLOURS
+        fig = go.Figure()
+
+        for party in speech_agg_df_highlighted.member_party.unique():
+
+            plot_df = speech_agg_df_highlighted.query(f"member_party=='{party}'")
+            fig.add_trace(go.Scatter(
+                x=plot_df['speeches_per_sitting'],
+                y=plot_df['questions_per_sitting'],
+                mode='markers',
+                marker=dict(
+                    color=[PARTY_COLOURS[i] for i in plot_df.member_party],
+                    size=plot_df['marker_size'],
+                    opacity=0.6
+                ),
+                hovertext="Member: " + plot_df['member_name'] + "<br>" +
+                            "Party: " + plot_df['member_party'] + "<br>" +
+                            "Speeches: " + plot_df['speeches_per_sitting'].astype(str) + "<br>" +
+                            "Questions: " + plot_df['questions_per_sitting'].astype(str) + "<br>" +
+                            "Words per Speech: " + plot_df['words_per_speech'].astype(str),
+                hoverinfo='text',
+                name=party,
+                showlegend=True  # Only the highlighted trace shows in legend
+            ))
+            
+        fig.add_trace(go.Scatter(
+            x=speech_agg_df_non_highlighted['speeches_per_sitting'],
+            y=speech_agg_df_non_highlighted['questions_per_sitting'],
+            mode='markers',
+            marker=dict(
+                color='grey',
+                size=speech_agg_df_non_highlighted['marker_size'],
+                opacity=0.2
+            ),
+            hoverinfo='skip',  # Disable hover for non-highlighted points
+            showlegend=False  # Non-highlighted trace doesn't show in legend
+        ))
+
+
+        fig.update_layout(
+            title=f'Questions vs. Speeches per Sitting - Parliament {selected_parliament}' + '<br>' + '<span style="font-size:12px; color:grey">Point size correspond to average no. of words per speech</span>',
+            xaxis_title="Speeches per Sitting",
+            yaxis_title="Questions per Sitting",
+            legend=dict(
+                title=dict(text='Party'),
+                yanchor="top",
+                y=0.99,
+                xanchor="right",
+                x=0.99
+            ),
+            template='plotly_white',
         )
-        fig.update_layout(transition_duration=500,
-                          legend=dict(
-                              title=dict(text='Party'),
-                              yanchor="top",
-                              y=0.99,
-                              xanchor="right",
-                              x=0.99
-                              ))
         
         # Prepare table data
         table_data = speech_summary_df.to_dict('records')

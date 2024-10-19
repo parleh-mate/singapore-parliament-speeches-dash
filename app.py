@@ -24,28 +24,16 @@ logger = logging.getLogger(__name__)
 # set time
 gmt_plus_8 = pytz.timezone('Asia/Singapore')
 
-# Set up cache
 cache = Cache(server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/tmp/cache-directory',  # Ensure this directory exists and is writable
-    'CACHE_TIME': datetime.now(gmt_plus_8) # Cache today's datetime
+    'CACHE_DIR': '/tmp/cache-directory'
 })
 
 # Data fetching function
 def get_data():
     data = cache.get('all_data')
-    time_loaded = cache.get('time_loaded')
 
-    current_time = datetime.now(gmt_plus_8)
-    # Create a datetime object for 1:00 AM today
-    today_1am = current_time.replace(hour=1, minute=0, second=0, microsecond=0)
-    # If current time is before 1:00 AM, go to the previous day's 1:00 AM
-    if current_time < today_1am:
-        previous_1am = today_1am - timedelta(days=1)
-    else:
-        previous_1am = today_1am   
-
-    if data is not None and time_loaded>previous_1am:
+    if data is not None:
         logger.debug(f"{datetime.now()} - Data fetched from cache")
         return data
     else:
@@ -56,7 +44,17 @@ def get_data():
             'speech_summaries': load_speech_summary(),
             'demographics': load_demographics()
         }
-        cache.set('all_data', data)
+
+        current_time = datetime.now(gmt_plus_8)
+        # Create a datetime object for next 1:00 AM
+        today_1am = current_time.replace(hour=1, minute=0, second=0, microsecond=0)
+        if current_time < today_1am and current_time >= (today_1am - timedelta(hours=1)):
+            next_1am = today_1am
+        else:
+            next_1am = today_1am + timedelta(days=1)
+
+        # set cached data to expire at next 1am
+        cache.set('all_data', data, timeout = (next_1am - current_time).seconds)
         cache.set('time_loaded', datetime.now(gmt_plus_8))
         return data
 
