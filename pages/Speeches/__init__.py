@@ -290,7 +290,7 @@ def speeches_callbacks(app, data):
                 xanchor="right",
                 x=0.99
             ),
-            template='plotly_white',
+            template='plotly_white'
         )
         
         # Prepare table data

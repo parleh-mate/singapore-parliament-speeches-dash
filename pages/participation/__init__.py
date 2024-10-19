@@ -2,6 +2,7 @@ import plotly.express as px
 from dash import html, dcc, Input, Output, dash_table
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import plotly.graph_objects as go
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
 
@@ -64,7 +65,7 @@ def participation_layout():
             # Table Section with Scroll
             dbc.Row([
                 dbc.Col([
-                    html.H2("Speech Summaries"),
+                    html.H2("Participationa and Attendance"),
                     dash_table.DataTable(
                         id='participation-summary-table',
                         columns=[
@@ -201,37 +202,59 @@ def participation_callbacks(app, data):
         
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
-            participation_df = participation_df[participation_df['member_constituency'] == selected_constituency]
+            participation_df_highlighted = participation_df[participation_df['member_constituency'] == selected_constituency]
         
         # Further filter based on selected_member
         if selected_member != 'All' and selected_member:
-            participation_df = participation_df[participation_df['member_name'] == selected_member]
+            participation_df_highlighted = participation_df_highlighted[participation_df_highlighted['member_name'] == selected_member]
+
+        if selected_constituency=='All' and selected_member=='All':
+            participation_df_highlighted = participation_df
+
+        participation_df_non_highlighted = participation_df.drop(participation_df_highlighted.index)      
 
         # Create the scatter plot
         fig = px.scatter(
-            participation_df,
+            participation_df_highlighted,
             x='attendance',
             y='participation',
             color='member_party',
             hover_data={
                 'member_name': True,
-                'member_party': True,
-                'attendance': ':.2f',
-                'participation': ':.2f'
+                'member_party': True
             },
-            title=f'Attendance vs Participation by member - Parliament {selected_parliament}',
+            title=f'Participation vs Attendance by member - Parliament {selected_parliament}',
             color_discrete_map=PARTY_COLOURS
         )
-        fig.update_layout(transition_duration=500,
-                          legend=dict(
+
+        fig.add_trace(go.Scatter(
+            x=participation_df_non_highlighted['attendance'],
+            y=participation_df_non_highlighted['participation'],
+            mode='markers',
+            marker=dict(
+                color='grey',
+                opacity=0.2
+            ),
+            hoverinfo='skip',  # Disable hover for non-highlighted points
+            showlegend=False  # Non-highlighted trace doesn't show in legend
+        ))
+
+        fig.update_layout(legend=dict(
                               title=dict(text='Party'),
                               yanchor="top",
                               y=0.99,
                               xanchor="left",
                               x=0.01
-                              ))
+                              ),
+                              template='plotly_white'
+        )
+                              
+        fig.update_traces(hovertemplate='Member: %{customdata[0]}<br>' +
+                          'Party: %{customdata[1]}<br>' +
+                          'Attendance: %{x}<br>' + 
+                          'Participation: %{y}')
         
         # Prepare table data
-        table_data = participation_df.to_dict('records')
+        table_data = participation_df_highlighted.to_dict('records')
         
         return fig, table_data
