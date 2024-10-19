@@ -63,7 +63,28 @@ def speeches_layout():
             # Table Section with Scroll
             dbc.Row([
                 dbc.Col([
-                    html.H2("Speech Summaries"),
+                    html.H2(["Speech Summaries",
+                             html.Span(
+                                 html.I(
+                                     className="bi bi-info-circle",
+                                        id="summary-info-icon",
+                                        style={
+                                            "margin-left": "10px",
+                                            "cursor": "pointer",
+                                            "color": "#17a2b8"  # Optional: Bootstrap info color
+                                        }
+                                    )
+                                )
+                            ],
+                            style={"display": "flex", "alignItems": "center"}
+                        ),                            
+                            # Tooltip Component
+                            dbc.Tooltip(
+                                "Speech summaries generated using GPT. Only a subset of speeches are summarised. Please refer to the methodology page for more information.",
+                                target="summary-info-icon",
+                                placement="right",
+                                style={"maxWidth": "300px"}  # Optional: Adjust tooltip width
+                            ),
                     dash_table.DataTable(
                         id='speech-summary-table',
                         columns=[

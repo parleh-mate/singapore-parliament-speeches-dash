@@ -14,7 +14,9 @@ from pages.demographics import demographics_callbacks, demographics_layout
 from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics
 
 # Initialize the app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX], suppress_callback_exceptions=True)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
+                                                "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+], suppress_callback_exceptions=True)
 server = app.server  # Expose the Flask app as a variable
 
 # Initialize logging
