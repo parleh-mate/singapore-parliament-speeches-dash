@@ -254,7 +254,8 @@ def demographics_callbacks(app, data):
                 y=0.99,
                 xanchor="left",
                 x=0.01
-            )
+            ),
+            template='plotly_white'
         )
 
         # ethnicity and gender graph
@@ -315,7 +316,8 @@ def demographics_callbacks(app, data):
                 y=0.99,
                 xanchor="right",
                 x=0.99
-            )
+            ),
+            template='plotly_white'
         )       
         
         return combined_fig, ethnicity_fig
