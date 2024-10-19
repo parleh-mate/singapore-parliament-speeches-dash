@@ -280,7 +280,7 @@ def speeches_callbacks(app, data):
 
 
         fig.update_layout(
-            title=f'Questions vs. Speeches per Sitting - Parliament {selected_parliament}' + '<br>' + '<span style="font-size:12px; color:grey">Point size correspond to average no. of words per speech</span>',
+            title=f'Questions vs. Speeches per Sitting - Parliament {selected_parliament}' + '<br>' + '<span style="font-size:12px; color:grey">Point size corresponds to average no. of words per speech</span>',
             xaxis_title="Speeches per Sitting",
             yaxis_title="Questions per Sitting",
             legend=dict(
