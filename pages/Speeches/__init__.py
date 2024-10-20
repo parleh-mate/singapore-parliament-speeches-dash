@@ -257,14 +257,16 @@ def speeches_callbacks(app, data):
         )
 
         # Filter by parliament        
-        speech_agg_df = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
+        speech_agg_df_highlighted = speech_agg_df[speech_agg_df['parliament'] == parliaments[selected_parliament]]
+
+        full_df = speech_agg_df_highlighted.copy()
 
         if selected_parliament != 'All' and selected_parliament:
             speech_summary_df = speech_summary_df[speech_summary_df['parliament'] == int(parliaments[selected_parliament])]
         
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
-            speech_agg_df_highlighted = speech_agg_df[speech_agg_df['member_constituency'] == selected_constituency]
+            speech_agg_df_highlighted = speech_agg_df_highlighted[speech_agg_df_highlighted['member_constituency'] == selected_constituency]
             speech_summary_df = speech_summary_df[speech_summary_df['member_constituency'] == selected_constituency]
         
         # Further filter based on selected_member
@@ -272,10 +274,7 @@ def speeches_callbacks(app, data):
             speech_agg_df_highlighted = speech_agg_df_highlighted[speech_agg_df_highlighted['member_name'] == selected_member]
             speech_summary_df = speech_summary_df[speech_summary_df['member_name'] == selected_member]
 
-        if selected_constituency=='All' and selected_member=='All':
-            speech_agg_df_highlighted = speech_agg_df
-
-        speech_agg_df_non_highlighted = speech_agg_df.drop(speech_agg_df_highlighted.index)        
+        speech_agg_df_non_highlighted = full_df.drop(speech_agg_df_highlighted.index)        
         
         # Create the scatter plot
         fig = go.Figure()
