@@ -49,7 +49,7 @@ def participation_layout():
                     
                     # Tooltip Component
                     dbc.Tooltip(
-                        "'All' takes the average across all parliamentary sessions",  # Tooltip text
+                        "'All' takes the average across all parliamentary sessions from the 12th to current",  # Tooltip text
                         target="participation_parliament-session-info-icon",  # Link tooltip to the icon's ID
                         placement="right",                      # Position the tooltip to the right of the icon
                         style={
@@ -315,7 +315,7 @@ def participation_callbacks(app, data):
         fig.update_traces(hovertemplate='Member: %{customdata[0]}<br>' +
                           'Party: %{customdata[1]}<br>' +
                           'Attendance: %{x}<br>' + 
-                          'Participation: %{y}')
+                          'Participation: %{y}<extra></extra>')
         
         # Prepare table data
         table_data = participation_df_highlighted.to_dict('records')
