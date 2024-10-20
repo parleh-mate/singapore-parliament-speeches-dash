@@ -10,12 +10,34 @@ from utils import PARTY_COLOURS, parliaments, parliament_sessions
 def participation_layout():
     return html.Div(
         [
-            html.H1("Parliamentary participation Analysis"),
+            html.H1("Parliamentary Participation Analysis"),
             
             # Dropdowns Section
             dbc.Row([
+                # Updated Column with Info Tooltip
                 dbc.Col([
-                    html.Label("Select a Parliament Session:"),
+                    # Container for the Label and Info Icon
+                    html.Div(
+                        [
+                            html.Label("Select a Parliament Session:"),
+                            html.Span(
+                                # Info Icon (Bootstrap Icons)
+                                html.I(
+                                    className="bi bi-info-circle",  # Bootstrap Icon classes
+                                    id="participation_parliament-session-info-icon",  # Unique ID for the tooltip
+                                    style={
+                                        "margin-left": "5px",          # Space between label and icon
+                                        "cursor": "pointer",           # Pointer cursor on hover
+                                        "color": "#17a2b8",            # Bootstrap's info color
+                                        "fontSize": "1rem"             # Icon size
+                                    }
+                                )
+                            )
+                        ],
+                        style={"display": "flex", "alignItems": "center"}  # Align label and icon vertically
+                    ),
+                    
+                    # Dropdown Component
                     dcc.Dropdown(
                         id='parliament-dropdown-participation',
                         options=[{'label': session, 'value': session} for session in parliament_sessions],
@@ -24,8 +46,20 @@ def participation_layout():
                         searchable=False,
                         clearable=False
                     ),
+                    
+                    # Tooltip Component
+                    dbc.Tooltip(
+                        "'All' takes the average across all parliamentary sessions",  # Tooltip text
+                        target="participation_parliament-session-info-icon",  # Link tooltip to the icon's ID
+                        placement="right",                      # Position the tooltip to the right of the icon
+                        style={
+                            "maxWidth": "300px",
+                            "textAlign": "left" 
+                        }
+                    )
                 ], md=4),
                 
+                # Second Dropdown Column
                 dbc.Col([
                     html.Label("Select a Constituency:"),
                     dcc.Dropdown(
@@ -38,6 +72,7 @@ def participation_layout():
                     )
                 ], md=4, id='constituency-dropdown-container-participation', style={'display': 'none'}),
                 
+                # Third Dropdown Column
                 dbc.Col([
                     html.Label("Select a Member Name:"),
                     dcc.Dropdown(
@@ -50,6 +85,32 @@ def participation_layout():
                     )
                 ], md=4),
             ], className="mb-4"),
+            
+            # Accordion Section
+            dbc.Accordion(
+                [
+                    dbc.AccordionItem(
+                        [
+                            html.P([
+                                "Attendance is measured by the number of sessions the member attended (or was present in) out of the total number of sessions which occurred while they were sitting as a member.",
+                                html.Br(),
+                                html.Br(),
+                                "Participation is measured by the number of sessions the member spoke in as a proportion of the number of sessions the member attended. Please refer to the methodology for more info."
+                            ])
+                        ],
+                        title=html.Span(
+                            "How is participation or attendance defined?",
+                            style={
+                                "fontWeight": "bold",
+                                "fontSize": "1.1rem"  # Optional: Increase font size
+                            }
+                        )
+                    )
+                ],
+                start_collapsed=True,
+                flush=True,
+                className="border border-primary"
+            ),
             
             # Graph Section with Fixed Height
             dbc.Row([
@@ -65,7 +126,7 @@ def participation_layout():
             # Table Section with Scroll
             dbc.Row([
                 dbc.Col([
-                    html.H2("Participationa and Attendance"),
+                    html.H2("Participation and Attendance"),
                     dash_table.DataTable(
                         id='participation-summary-table',
                         columns=[
@@ -246,6 +307,8 @@ def participation_callbacks(app, data):
                               xanchor="left",
                               x=0.01
                               ),
+                              xaxis_title="Attendance",
+                              yaxis_title="Participation",
                               template='plotly_white'
         )
                               

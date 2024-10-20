@@ -9,10 +9,34 @@ def speeches_layout():
     return html.Div(
         [
             html.H1("Parliamentary Speeches Analysis"),            
+            
             # Dropdowns Section
             dbc.Row([
+                # Updated Column with Info Tooltip
                 dbc.Col([
-                    html.Label("Select a Parliament Session:"),
+                    # Container for the Label and Info Icon
+                    html.Div(
+                        [
+                            html.Label("Select a Parliament Session:"),
+                            html.Span(
+                                # Info Icon (Bootstrap Icons)
+                                html.I(
+                                    className="bi bi-info-circle",  # Bootstrap Icon classes
+                                    id="speech_parliament-session-info-icon",  # Unique ID for the tooltip
+                                    style={
+                                        "margin-left": "5px",          # Space between label and icon
+                                        "cursor": "pointer",           # Pointer cursor on hover
+                                        "color": "#17a2b8",            # Bootstrap's info color
+                                        "fontSize": "1rem"             # Icon size
+                                    }
+                                    # Removed aria_label as it may not be supported directly
+                                )
+                            )
+                        ],
+                        style={"display": "flex", "alignItems": "center"}  # Align label and icon vertically
+                    ),
+                    
+                    # Dropdown Component
                     dcc.Dropdown(
                         id='parliament-dropdown',
                         options=[{'label': session, 'value': session} for session in parliament_sessions],
@@ -21,8 +45,20 @@ def speeches_layout():
                         searchable=False,
                         clearable=False
                     ),
+                    
+                    # Tooltip Component
+                    dbc.Tooltip(
+                        "'All' takes the average across all parliamentary sessions",
+                        target="speech_parliament-session-info-icon",  # Link tooltip to the icon's ID
+                        placement="right",                      # Position the tooltip to the right of the icon
+                        style={
+                            "maxWidth": "300px",
+                            "textAlign": "left"  # Ensure text is left-aligned within the tooltip
+                        }
+                    )
                 ], md=4),
                 
+                # Second Dropdown Column
                 dbc.Col([
                     html.Label("Select a Constituency:"),
                     dcc.Dropdown(
@@ -35,6 +71,7 @@ def speeches_layout():
                     )
                 ], md=4, id='constituency-dropdown-container', style={'display': 'none'}),
                 
+                # Third Dropdown Column
                 dbc.Col([
                     html.Label("Select a Member Name:"),
                     dcc.Dropdown(
@@ -47,21 +84,33 @@ def speeches_layout():
                     )
                 ], md=4),
             ], className="mb-4"),
-                                dbc.Accordion(
-            [
-                dbc.AccordionItem(
-                    [html.P("Speeches refers to any time a member speaks (substantial or procedural) with the exception of parliamentary questions. Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info.")],
-                    title=html.Span(
-                        "How is a speech or question defined?",
-                        style={
-                            "fontWeight": "bold",
-                        }
+            
+            # Accordion Section
+            dbc.Accordion(
+                [
+                    dbc.AccordionItem(
+                        [
+                            html.P(
+                                [
+                                    "Speeches refers to any time a member speaks (substantial or procedural) with the exception of parliamentary questions. ",
+                                    html.Br(),
+                                    html.Br(),
+                                    "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info."
+                                ]
+                            )
+                        ],
+                        title=html.Span(
+                            "How is a speech or question defined?",
+                            style={
+                                "fontWeight": "bold",
+                                "fontSize": "1.1rem"  # Optional: Increase font size
+                            }
+                        )
                     )
-                )
-            ],
-            start_collapsed=True,
-            flush=True,
-            className="border border-primary"
+                ],
+                start_collapsed=True,
+                flush=True,
+                className="border border-primary"
             ),
             
             # Graph Section with Fixed Height
@@ -78,29 +127,30 @@ def speeches_layout():
             # Table Section with Scroll
             dbc.Row([
                 dbc.Col([
-                    html.H2(["Speech Summaries",
-                             html.Span(
-                                 html.I(
-                                     className="bi bi-info-circle",
-                                        id="summary-info-icon",
-                                        style={
-                                            "margin-left": "10px",
-                                            "cursor": "pointer",
-                                            "color": "#17a2b8"  # Optional: Bootstrap info color
-                                        }
-                                    )
-                                )
-                            ],
-                            style={"display": "flex", "alignItems": "center"}
-                        ),                            
-                            # Tooltip Component
-                            dbc.Tooltip(
-                                html.Div("Speech summaries and topics generated using GPT. Only a subset of speeches are summarised and labelled. Please refer to the methodology for more info.",
-                                         style={"textAlign": "left"}),
-                                target="summary-info-icon",
-                                placement="right",
-                                style={"maxWidth": "300px"}  # Optional: Adjust tooltip width
-                            ),
+                    html.H2([
+                        "Speech Summaries",
+                        html.Span(
+                            html.I(
+                                className="bi bi-info-circle",
+                                id="summary-info-icon",
+                                style={
+                                    "margin-left": "10px",
+                                    "cursor": "pointer",
+                                    "color": "#17a2b8"  # Optional: Bootstrap info color
+                                }
+                            )
+                        )
+                    ],
+                    style={"display": "flex", "alignItems": "center"}),
+                    
+                    # Tooltip Component
+                    dbc.Tooltip(
+                        "Speech summaries and topics generated using GPT. Only a subset of speeches are summarised and labelled. Please refer to the methodology for more info.",
+                        target="summary-info-icon",
+                        placement="right",
+                        style={"maxWidth": "300px"}  # Optional: Adjust tooltip width
+                    ),
+                    
                     dash_table.DataTable(
                         id='speech-summary-table',
                         columns=[
