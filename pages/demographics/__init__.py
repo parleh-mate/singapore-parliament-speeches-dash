@@ -33,6 +33,32 @@ def demographics_layout():
                     ),
                 ], md=4),
             ], className="mb-4"),
+                        dbc.Accordion(
+                [
+                    dbc.AccordionItem(
+                        [
+                            html.P(
+                                [
+                                    "The graph on the left shows the age distribution of members within each party. Because we do not have exact member birth dates, age is taken as a member's age in the year of their first sitting for that parliament session. The bars on the percentage plot show the porportion of members within a party that have members that fall into a certain age bin, while the density plot is a smoothed probability distribution. Derived probabilities (Y-axis) on the density plot are redacted since these are irrelevant quantities.",
+                                    html.Br(),
+                                    html.Br(),
+                                    "The graph on the right shows the ethnic and gender distribution of members within each party. Solid bars refer to male members, and striped bars to female members. For example, in the 13th parliament, 27.8% of all NMPs were Chinese males, while 5.6% were Indian females. Please refer to the methodology for more info."
+                                ]
+                            )
+                        ],
+                        title=html.Span(
+                            "How to understand these graphs?",
+                            style={
+                                "fontWeight": "bold",
+                                "fontSize": "1.1rem"  # Optional: Increase font size
+                            }
+                        )
+                    )
+                ],
+                start_collapsed=True,
+                flush=True,
+                className="border border-primary"
+            ),
             
             # Graph Section with Fixed Height
             dbc.Row([
@@ -305,7 +331,7 @@ def demographics_callbacks(app, data):
         # Final layout adjustments
         ethnicity_fig.update_layout(
             barmode='relative',  # Group the bars by party
-            title='Ethnicity and Gender Distribution by Party',
+            title='Ethnic and Gender Distribution by Party',
             xaxis_title='Ethnicity',
             yaxis_title='Percentage',
             showlegend=True,

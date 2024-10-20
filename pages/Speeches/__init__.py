@@ -92,7 +92,7 @@ def speeches_layout():
                         [
                             html.P(
                                 [
-                                    "Speeches refers to any time a member speaks (substantial or procedural) with the exception of parliamentary questions. ",
+                                    "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does include written answers or parliamentary questions.",
                                     html.Br(),
                                     html.Br(),
                                     "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info."
