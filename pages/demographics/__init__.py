@@ -76,7 +76,7 @@ def demographics_callbacks(app, data):
             x='year_age_entered',
             color='party', 
             opacity=0.75,
-            histnorm='probability',
+            histnorm='percent',
             color_discrete_map=PARTY_COLOURS,
             barmode='group'
         )
@@ -97,7 +97,7 @@ def demographics_callbacks(app, data):
 
         age_histogram.update_traces(
             hovertemplate="<b>Year Age Entered:</b> %{x}<br>" +
-            "<b>Proportion:</b> %{y:.2f}<extra></extra>"
+            "<b>Percentage:</b> %{y:.1f}<extra></extra>"
             )
         
         # now the density plot 
@@ -175,19 +175,19 @@ def demographics_callbacks(app, data):
         # Create buttons
         buttons = [
             dict(
-                label="Proportion",
+                label="Percentage",
                 method="update",
                 args=[
                     {"visible": [True]*num_hist_traces + [False]*num_kde_traces},
                     {
-                        "title": "Age at Year of First Sitting",
+                        "title": "Age Distribution by Party",
                         "xaxis": {"title": "Year-age at first sitting",
                                   "tick0": min_tick,
                                   "dtick": 5,
                                   "tickvals": tickvals,
                                   "range": [min_tick, max_tick]
                                   },
-                        "yaxis": {"title": "Proportion"}
+                        "yaxis": {"title": "Percentage"}
                     }
                 ]
             ),
@@ -197,7 +197,7 @@ def demographics_callbacks(app, data):
                 args=[
                     {"visible": [False]*num_hist_traces + [True]*num_kde_traces},
                     {
-                        "title": "Age at Year of First Sitting",
+                        "title": "Age Distribution by Party",
                         "xaxis": {"title": "Year-age at first sitting",
                                   "tick0": min_tick,
                                   "dtick": 5,
@@ -245,8 +245,8 @@ def demographics_callbacks(app, data):
         # Optionally, update axes and layout as needed
         combined_fig.update_layout(
             xaxis_title="Year-age at first sitting",
-            yaxis_title="Proportion",
-            title="Age at Year of First Sitting",
+            yaxis_title="Percentage",
+            title="Age Distribution by Party",
             margin=dict(l=0, r=0),
             legend=dict(
                 title=dict(text='Party'),
@@ -262,7 +262,7 @@ def demographics_callbacks(app, data):
 
         ethnicity_df = demographics_df.groupby(['party', 'member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
 
-        ethnicity_df['proportion'] = ethnicity_df['count'] / ethnicity_df.groupby('party')['count'].transform('sum')
+        ethnicity_df['percentage'] = ethnicity_df['count']*100 / ethnicity_df.groupby('party')['count'].transform('sum')
 
         custom_order = ['chinese', 'malay', 'indian', 'others']
         ethnicity_df['member_ethnicity'] = pd.Categorical(ethnicity_df['member_ethnicity'], categories=custom_order, ordered=True)
@@ -286,7 +286,7 @@ def demographics_callbacks(app, data):
             # Loop through parties and add bars
             for party in ethnicity_df['party'].unique():
                 # Mask the data for the current party
-                y = df_tmp['proportion'].mask(ethnicity_df['party'] != party, pd.NA)
+                y = df_tmp['percentage'].mask(ethnicity_df['party'] != party, pd.NA)
 
                 # Add a trace for each party and gender
                 ethnicity_fig.add_bar(
@@ -298,16 +298,16 @@ def demographics_callbacks(app, data):
                     marker_color=PARTY_COLOURS[party],  # Use the custom color for the party
                     hovertemplate="<b>Ethnicity:</b> %{x[0]}<br>" +
                                 "<b>Party:</b> %{x[1]}<br>" +
-                                "<b>Proportion:</b> %{y:.2f}<br>" +
+                                "<b>Percentage:</b> %{y:.1f}<br>" +
                                 "<b>Gender:</b> %{hovertext}<extra></extra>"
                 )
 
         # Final layout adjustments
         ethnicity_fig.update_layout(
             barmode='relative',  # Group the bars by party
-            title='Ethnicity and Gender',
+            title='Ethnicity and Gender Distribution by Party',
             xaxis_title='Ethnicity',
-            yaxis_title='Proportion',
+            yaxis_title='Percentage',
             showlegend=True,
             margin=dict(l=0, r=0),
             legend=dict(

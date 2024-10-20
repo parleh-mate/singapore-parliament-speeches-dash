@@ -307,8 +307,8 @@ def participation_callbacks(app, data):
                               xanchor="left",
                               x=0.01
                               ),
-                              xaxis_title="Attendance",
-                              yaxis_title="Participation",
+                              xaxis_title="Attendance (%)",
+                              yaxis_title="Participation (%)",
                               template='plotly_white'
         )
                               

@@ -92,8 +92,8 @@ def load_participation():
                         UNION ALL
                         SELECT * FROM all_parl
                         )
-                        select member_name, parliament, member_party, member_constituency, round(sittings_present/nullif(sittings_total, 0), 2) as attendance, 
-                        round(sittings_spoken/nullif(sittings_present, 0), 2) as participation
+                        select member_name, parliament, member_party, member_constituency, round(100*sittings_present/nullif(sittings_total, 0), 1) as attendance, 
+                        round(100*sittings_spoken/nullif(sittings_present, 0), 1) as participation
                         from participation
                         WHERE member_constituency is not NULL
     """)

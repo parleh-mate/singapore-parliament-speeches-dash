@@ -28,7 +28,7 @@ gmt_plus_8 = pytz.timezone('Asia/Singapore')
 
 cache = Cache(server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/tmp/cache-directory'
+    'CACHE_DIR': '/cache-directory'
 })
 
 # Data fetching function
