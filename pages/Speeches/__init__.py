@@ -8,8 +8,7 @@ from utils import PARTY_COLOURS, parliaments, parliament_sessions
 def speeches_layout():
     return html.Div(
         [
-            html.H1("Parliamentary Speeches Analysis"),
-            
+            html.H1("Parliamentary Speeches Analysis"),            
             # Dropdowns Section
             dbc.Row([
                 dbc.Col([
@@ -48,6 +47,22 @@ def speeches_layout():
                     )
                 ], md=4),
             ], className="mb-4"),
+                                dbc.Accordion(
+            [
+                dbc.AccordionItem(
+                    [html.P("Speeches refers to any time a member speaks (substantial or procedural) with the exception of parliamentary questions. Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info.")],
+                    title=html.Span(
+                        "How is a speech or question defined?",
+                        style={
+                            "fontWeight": "bold",
+                        }
+                    )
+                )
+            ],
+            start_collapsed=True,
+            flush=True,
+            className="border border-primary"
+            ),
             
             # Graph Section with Fixed Height
             dbc.Row([
@@ -80,7 +95,8 @@ def speeches_layout():
                         ),                            
                             # Tooltip Component
                             dbc.Tooltip(
-                                "Speech summaries generated using GPT. Only a subset of speeches are summarised. Please refer to the methodology page for more information.",
+                                html.Div("Speech summaries and topics generated using GPT. Only a subset of speeches are summarised and labelled. Please refer to the methodology for more info.",
+                                         style={"textAlign": "left"}),
                                 target="summary-info-icon",
                                 placement="right",
                                 style={"maxWidth": "300px"}  # Optional: Adjust tooltip width
