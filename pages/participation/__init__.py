@@ -259,34 +259,40 @@ def participation_callbacks(app, data):
         participation_df = data['participation']
 
         # Filter by parliament
-        participation_df = participation_df[participation_df['parliament'] == parliaments[selected_parliament]]
+        participation_df_highlighted = participation_df[participation_df['parliament'] == parliaments[selected_parliament]]
+        full_df = participation_df_highlighted.copy()
         
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
-            participation_df_highlighted = participation_df[participation_df['member_constituency'] == selected_constituency]
+            participation_df_highlighted = participation_df_highlighted[participation_df_highlighted['member_constituency'] == selected_constituency]
         
         # Further filter based on selected_member
         if selected_member != 'All' and selected_member:
             participation_df_highlighted = participation_df_highlighted[participation_df_highlighted['member_name'] == selected_member]
 
-        if selected_constituency=='All' and selected_member=='All':
-            participation_df_highlighted = participation_df
-
-        participation_df_non_highlighted = participation_df.drop(participation_df_highlighted.index)      
+        participation_df_non_highlighted = full_df.drop(participation_df_highlighted.index)      
 
         # Create the scatter plot
-        fig = px.scatter(
-            participation_df_highlighted,
-            x='attendance',
-            y='participation',
-            color='member_party',
-            hover_data={
-                'member_name': True,
-                'member_party': True
-            },
-            title=f'Participation vs Attendance by member - Parliament {selected_parliament}',
-            color_discrete_map=PARTY_COLOURS
-        )
+        fig = go.Figure()
+
+        for party in participation_df_highlighted.member_party.unique():
+
+            plot_df = participation_df_highlighted.query(f"member_party=='{party}'")
+            fig.add_trace(go.Scatter(
+                x=plot_df['attendance'],
+                y=plot_df['participation'],
+                mode='markers',
+                marker=dict(
+                    color=[PARTY_COLOURS[i] for i in plot_df.member_party]
+                ),
+                hovertext="Member: " + plot_df['member_name'] + "<br>" +
+                            "Party: " + plot_df['member_party'] + "<br>" +
+                            "Attendance: " + plot_df['attendance'].astype(str) + "<br>" +
+                            "Participation: " + plot_df['participation'].astype(str),
+                hoverinfo='text',
+                name=party,
+                showlegend=True  # Only the highlighted trace shows in legend
+            ))
 
         fig.add_trace(go.Scatter(
             x=participation_df_non_highlighted['attendance'],
@@ -311,11 +317,6 @@ def participation_callbacks(app, data):
                               yaxis_title="Participation (%)",
                               template='plotly_white'
         )
-                              
-        fig.update_traces(hovertemplate='Member: %{customdata[0]}<br>' +
-                          'Party: %{customdata[1]}<br>' +
-                          'Attendance: %{x}<br>' + 
-                          'Participation: %{y}<extra></extra>')
         
         # Prepare table data
         table_data = participation_df_highlighted.to_dict('records')
