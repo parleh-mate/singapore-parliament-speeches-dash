@@ -83,9 +83,9 @@ def load_participation():
                                                 group by member_name, parliament, member_party, member_constituency
                         ),
                         all_parl as(
-                        SELECT member_name, 'All' as parliament, member_party, member_constituency, sum(count_sittings_total) as sittings_total, sum(count_sittings_present) as sittings_present, sum(count_sittings_spoken) as sittings_spoken
+                        SELECT member_name, 'All' as parliament, member_party, 'All' as member_constituency, sum(count_sittings_total) as sittings_total, sum(count_sittings_present) as sittings_present, sum(count_sittings_spoken) as sittings_spoken
                                                 FROM `singapore-parliament-speeches.prod_agg.agg_speech_metrics_by_member`
-                                                group by member_name, member_party, member_constituency
+                                                group by member_name, member_party
                         ),
                         participation as(
                         SELECT * FROM by_parl
