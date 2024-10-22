@@ -334,7 +334,7 @@ def speeches_callbacks(app, data):
             plot_df = speech_agg_df_highlighted.query(f"member_party=='{party}'")
             fig.add_trace(go.Scatter(
                 x=plot_df['speeches_per_sitting'],
-                y=plot_df['questions_per_sitting'],
+                y=plot_df['readability_score'],
                 mode='markers',
                 marker=dict(
                     color=[PARTY_COLOURS[i] for i in plot_df.member_party],
@@ -344,7 +344,7 @@ def speeches_callbacks(app, data):
                 hovertext="Member: " + plot_df['member_name'] + "<br>" +
                             "Party: " + plot_df['member_party'] + "<br>" +
                             "Speeches: " + plot_df['speeches_per_sitting'].astype(str) + "<br>" +
-                            "Questions: " + plot_df['questions_per_sitting'].astype(str) + "<br>" +
+                            "Readability: " + plot_df['readability_score'].astype(str) + "<br>" +
                             "Words per Speech: " + plot_df['words_per_speech'].astype(str),
                 hoverinfo='text',
                 name=party,
@@ -353,7 +353,7 @@ def speeches_callbacks(app, data):
             
         fig.add_trace(go.Scatter(
             x=speech_agg_df_non_highlighted['speeches_per_sitting'],
-            y=speech_agg_df_non_highlighted['questions_per_sitting'],
+            y=speech_agg_df_non_highlighted['readability_score'],
             mode='markers',
             marker=dict(
                 color='grey',
@@ -368,7 +368,7 @@ def speeches_callbacks(app, data):
         fig.update_layout(
             title=f'Questions vs. Speeches per Sitting - Parliament {selected_parliament}' + '<br>' + '<span style="font-size:12px; color:grey">Point size corresponds to average no. of words per speech</span>',
             xaxis_title="Speeches per Sitting",
-            yaxis_title="Questions per Sitting",
+            yaxis_title="Readability Score",
             legend=dict(
                 title=dict(text='Party'),
                 yanchor="top",
