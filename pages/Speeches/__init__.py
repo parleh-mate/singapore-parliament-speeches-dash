@@ -48,7 +48,7 @@ def speeches_layout():
                     
                     # Tooltip Component
                     dbc.Tooltip(
-                        "'All' takes the average across all parliamentary sessions from the 12th to current",
+                        "'All' takes the average across all parliamentary sittings from the 12th parliament to current",
                         target="speech_parliament-session-info-icon",  # Link tooltip to the icon's ID
                         placement="right",                      # Position the tooltip to the right of the icon
                         style={
