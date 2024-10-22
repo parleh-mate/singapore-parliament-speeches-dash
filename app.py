@@ -10,6 +10,7 @@ from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.demographics import demographics_callbacks, demographics_layout
+from pages.methodology import methodology_layout
 
 from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics
 
@@ -28,7 +29,7 @@ gmt_plus_8 = pytz.timezone('Asia/Singapore')
 
 cache = Cache(server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/cache-directory'
+    'CACHE_DIR': '/tmp/cache-directory'
 })
 
 # Data fetching function
@@ -81,15 +82,17 @@ app.layout = html.Div([
             dbc.Col(sidebar, xs=12, md=2, className="d-none d-md-block"),  # Sidebar column
             dbc.Col([
                 # Home Page Div
-                html.Div(id='home', children=home_page, style={'display': 'block'}),
+                html.Div(id='home-page', children=home_page, style={'display': 'block'}),
                 
                 # Speeches Page Div
-                html.Div(id='speeches', children=speeches_layout(), style={'display': 'none'}),
+                html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
                 
                 # Participation Page Div
-                html.Div(id='participation', children=participation_layout(), style={'display': 'none'}),
+                html.Div(id='participation-page', children=participation_layout(), style={'display': 'none'}),
 
-                html.Div(id='demographics', children=demographics_layout(), style={'display': 'none'}),
+                html.Div(id='demographics-page', children=demographics_layout(), style={'display': 'none'}),
+
+                html.Div(id='methodology-page', children=methodology_layout(), style={'display': 'none'}),
 
                 # 404 Page Div
                 html.Div(
@@ -107,10 +110,11 @@ app.layout = html.Div([
 ])
 
 # generate page outputs, make it easier to toggle display later on
-page_outputs = {"home": Output('home', 'style'),
-                "participation": Output('participation', 'style'),
-                "speeches": Output('speeches', 'style'),
-                "demographics": Output('demographics', 'style'),
+page_outputs = {"home": Output('home-page', 'style'),
+                "participation": Output('participation-page', 'style'),
+                "speeches": Output('speeches-page', 'style'),
+                "demographics": Output('demographics-page', 'style'),
+                "methodology": Output('methodology-page', 'style'),
                 "404": Output('404-page', 'style')}
 
 # Callback to control page visibility
