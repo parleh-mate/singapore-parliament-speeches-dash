@@ -11,6 +11,7 @@ from pages.speeches import speeches_callbacks, speeches_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
+from pages.about import about_layout
 
 from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics
 
@@ -94,6 +95,8 @@ app.layout = html.Div([
 
                 html.Div(id='methodology-page', children=methodology_layout(), style={'display': 'none'}),
 
+                html.Div(id='about-page', children=about_layout(), style={'display': 'none'}),
+
                 # 404 Page Div
                 html.Div(
                     id='404-page',
@@ -115,6 +118,7 @@ page_outputs = {"home": Output('home-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
                 "methodology": Output('methodology-page', 'style'),
+                "about": Output('about-page', 'style'),
                 "404": Output('404-page', 'style')}
 
 # Callback to control page visibility
