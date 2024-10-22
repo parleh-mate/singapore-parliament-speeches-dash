@@ -19,6 +19,7 @@ FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
 where not is_vernacular_speech
 and not is_primary_question
 and count_speeches_words>0
+and member_constituency is not NULL
 ),
 by_parl_speeches AS (
 SELECT member_name, CAST(parliament as STRING) as parliament, member_party, member_constituency,
