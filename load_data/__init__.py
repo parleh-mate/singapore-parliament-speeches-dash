@@ -9,53 +9,76 @@ gbq_client = bigquery.Client()
 def load_speech_agg():
 
     job = gbq_client.query("""
-        WITH CTE AS (
+        WITH cte_speeches AS (
             SELECT *, count_speeches - count_pri_questions AS count_only_speeches
             FROM `singapore-parliament-speeches.prod_agg.agg_speech_metrics_by_member`
             ),
-            by_parl AS (
-            SELECT member_name, CAST(parliament as STRING) as parliament, member_party, member_constituency,
-                    ROUND(CASE 
-                        WHEN SUM(count_sittings_present) = 0 THEN 0 
-                        ELSE SUM(count_pri_questions) / SUM(count_sittings_present) 
-                    END, 2) AS questions_per_sitting,
-                    CAST(CASE 
-                        WHEN SUM(count_only_speeches) = 0 THEN 0 
-                        ELSE SUM(count_words) / SUM(count_only_speeches) 
-                    END AS INTEGER) AS words_per_speech,
-                    ROUND(CASE 
-                        WHEN SUM(count_sittings_present) = 0 THEN 0 
-                        ELSE SUM(count_only_speeches) / SUM(count_sittings_present) 
-                    END, 2) AS speeches_per_sitting
-            FROM CTE
-            GROUP BY parliament, member_party, member_constituency, member_name
-            ), 
-            all_parl AS (
-            SELECT member_name, 'All' AS parliament, member_party, 'All' as member_constituency,
-                    ROUND(CASE 
-                        WHEN SUM(count_sittings_present) = 0 THEN 0 
-                        ELSE SUM(count_pri_questions) / SUM(count_sittings_present) 
-                    END, 2) AS questions_per_sitting,
-                    CAST(CASE 
-                        WHEN SUM(count_only_speeches) = 0 THEN 0 
-                        ELSE SUM(count_words) / SUM(count_only_speeches) 
-                    END AS INTEGER) AS words_per_speech,
-                    ROUND(CASE 
-                        WHEN SUM(count_sittings_present) = 0 THEN 0 
-                        ELSE SUM(count_only_speeches) / SUM(count_sittings_present) 
-                    END, 2) AS speeches_per_sitting
-            FROM CTE
-            WHERE member_constituency is not NULL
-            GROUP BY member_name, member_party
-            ),
-            speech_agg as(
-            SELECT * FROM by_parl
-            UNION ALL
-            SELECT * FROM all_parl
-            )
-            select *
-            from speech_agg
-            where member_constituency is not NULL
+cte_readability as (
+SELECT member_name, parliament, 206.835 - 1.015*(count_speeches_words / count_speeches_sentences) - 84.6*(count_speeches_syllables/count_speeches_words) as readability_score
+FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
+where not is_vernacular_speech
+and not is_primary_question
+and count_speeches_words>0
+),
+by_parl_speeches AS (
+SELECT member_name, CAST(parliament as STRING) as parliament, member_party, member_constituency,
+        ROUND(CASE 
+            WHEN SUM(count_sittings_present) = 0 THEN 0 
+            ELSE SUM(count_pri_questions) / SUM(count_sittings_present) 
+        END, 2) AS questions_per_sitting,
+        CAST(CASE 
+            WHEN SUM(count_only_speeches) = 0 THEN 0 
+            ELSE SUM(count_words) / SUM(count_only_speeches) 
+        END AS INTEGER) AS words_per_speech,
+        ROUND(CASE 
+            WHEN SUM(count_sittings_present) = 0 THEN 0 
+            ELSE SUM(count_only_speeches) / SUM(count_sittings_present) 
+        END, 2) AS speeches_per_sitting
+FROM cte_speeches
+GROUP BY parliament, member_party, member_constituency, member_name
+), 
+by_parl_join_readability as (
+select *
+from by_parl_speeches
+left join (select member_name, CAST(parliament as STRING) as parliament, round(avg(readability_score), 1) as readability_score
+from cte_readability
+group by member_name, parliament)
+using (member_name, parliament)
+),
+all_parl_speeches AS (
+SELECT member_name, 'All' AS parliament, member_party, 'All' as member_constituency,
+        ROUND(CASE 
+            WHEN SUM(count_sittings_present) = 0 THEN 0 
+            ELSE SUM(count_pri_questions) / SUM(count_sittings_present) 
+        END, 2) AS questions_per_sitting,
+        CAST(CASE 
+            WHEN SUM(count_only_speeches) = 0 THEN 0 
+            ELSE SUM(count_words) / SUM(count_only_speeches) 
+        END AS INTEGER) AS words_per_speech,
+        ROUND(CASE 
+            WHEN SUM(count_sittings_present) = 0 THEN 0 
+            ELSE SUM(count_only_speeches) / SUM(count_sittings_present) 
+        END, 2) AS speeches_per_sitting
+FROM cte_speeches
+WHERE member_constituency is not NULL
+GROUP BY member_name, member_party
+),
+all_parl_join_readability as (
+select *
+from all_parl_speeches
+left join (select member_name, 'All' as parliament, round(avg(readability_score), 1) as readability_score
+from cte_readability
+group by member_name)
+using (member_name, parliament)
+),
+speech_agg as(
+SELECT * FROM by_parl_join_readability
+UNION ALL
+SELECT * FROM all_parl_join_readability
+)
+select *
+from speech_agg
+where member_constituency is not NULL
 
     """)
     result = job.result()
