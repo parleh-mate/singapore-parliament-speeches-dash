@@ -49,7 +49,7 @@ def participation_layout():
                     
                     # Tooltip Component
                     dbc.Tooltip(
-                        "'All' takes the average across all parliamentary sessions from the 12th to current",  # Tooltip text
+                        "'All' takes the average across all parliamentary sittings from the 12th parliament to current",  # Tooltip text
                         target="participation_parliament-session-info-icon",  # Link tooltip to the icon's ID
                         placement="right",                      # Position the tooltip to the right of the icon
                         style={
