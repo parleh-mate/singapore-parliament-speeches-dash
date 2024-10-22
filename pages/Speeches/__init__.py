@@ -92,10 +92,12 @@ def speeches_layout():
                         [
                             html.P(
                                 [
-                                    "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does include written answers or parliamentary questions.",
+                                    "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does include written answers, parliamentary questions, or the President's address.",
                                     html.Br(),
                                     html.Br(),
-                                    "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info."
+                                    "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info.",
+                                    html.Br(),
+                                    "Readability score is Flesch-Kincaid score...Members who did not speak do not have a readability score and will not appear on the graph. For example, Halimah Yacob (PAP) was in the 13th Parliament from xx to xx before contesting for the Presidency. During that time she made no speeches and therefore does not appear on the graph for that Parliament."
                                 ]
                             )
                         ],
