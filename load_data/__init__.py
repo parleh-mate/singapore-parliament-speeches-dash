@@ -20,6 +20,7 @@ where not is_vernacular_speech
 and not is_primary_question
 and count_speeches_words>0
 and member_constituency is not NULL
+and 'Speaker' not in UNNEST(member_appointments)
 ),
 by_parl_speeches AS (
 SELECT member_name, CAST(parliament as STRING) as parliament, member_party, member_constituency,
@@ -135,6 +136,21 @@ def load_demographics():
                     using (member_name)
                     order by member_name, parliament
 """)
+    result = job.result()
+    return result.to_dataframe()
+
+def load_questions():
+    job = gbq_client.query("""
+                       with cte as (SELECT ministry_addressed, member_party, count(ministry_addressed) as count_questions
+                        FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
+                        where is_primary_question
+                        and member_party is not NULL
+                        and ministry_addressed is not NULL
+                        group by member_party, ministry_addressed
+                        )
+                        select *, round(100*count_questions / sum(count_questions) over (partition by member_party), 2) as prop_questions
+                        from cte
+    """)
     result = job.result()
     return result.to_dataframe()
     
