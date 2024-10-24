@@ -339,7 +339,7 @@ def speeches_callbacks(app, data):
                 y=plot_df['readability_score'],
                 mode='markers',
                 marker=dict(
-                    color=[PARTY_COLOURS[i] for i in plot_df.member_party],
+                    color=plot_df['member_party'].map(PARTY_COLOURS),
                     size=plot_df['marker_size'],
                     opacity=0.6
                 ),

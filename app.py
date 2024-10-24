@@ -13,7 +13,7 @@ from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
 
-from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics
+from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics, load_questions
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
@@ -30,7 +30,7 @@ gmt_plus_8 = pytz.timezone('Asia/Singapore')
 
 cache = Cache(server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/tmp/cache-directory'
+    'CACHE_DIR': 'tmp/cache-directory'
 })
 
 # Data fetching function
@@ -46,7 +46,8 @@ def get_data():
             'participation': load_participation(),
             'speech_agg': load_speech_agg(),
             'speech_summaries': load_speech_summary(),
-            'demographics': load_demographics()
+            'demographics': load_demographics(),
+            'questions': load_questions()
         }
 
         current_time = datetime.now(gmt_plus_8)

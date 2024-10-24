@@ -4,12 +4,13 @@ import dash_bootstrap_components as dbc
 def methodology_layout():
     return html.Div(
         [
-            html.H1("Methodology"),
+            html.H1("Methodology/FAQ"),
             html.P(
                 "This section describes how our data is sourced and transformed into the graphs and tables you see on the app. Our aim is to be as transparent as possible and provide users with the necessary context to understand what they are looking at."
             ),
             
             # Table of Contents
+            html.H4("Methodology"),
             html.Ul([
                 html.Li(html.A("Data Sourcing", href="#datasourcing-method")),
                 html.Li(html.A("Participation", href="#participation-method")),
