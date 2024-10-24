@@ -1,7 +1,7 @@
 # app.yaml
 runtime: python310  # Use the appropriate Python runtime
 entrypoint: gunicorn -b :$PORT app:server
-service: dash-test
+service: parlehmate
 
 # Optional: Configure automatic scaling
 automatic_scaling:
