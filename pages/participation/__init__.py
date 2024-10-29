@@ -1,7 +1,5 @@
-import plotly.express as px
 from dash import html, dcc, Input, Output, dash_table
 import dash_bootstrap_components as dbc
-import plotly.express as px
 import plotly.graph_objects as go
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
