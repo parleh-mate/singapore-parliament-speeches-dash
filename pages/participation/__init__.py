@@ -283,7 +283,7 @@ def participation_callbacks(app, data):
                 y=plot_df['participation'],
                 mode='markers',
                 marker=dict(
-                    color=[PARTY_COLOURS[i] for i in plot_df.member_party]
+                    color=plot_df['member_party'].map(PARTY_COLOURS)
                 ),
                 hovertext="Member: " + plot_df['member_name'] + "<br>" +
                             "Party: " + plot_df['member_party'] + "<br>" +
