@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.participation import participation_callbacks, participation_layout
+from pages.questions import questions_callbacks, questions_layout
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
@@ -83,14 +84,13 @@ app.layout = html.Div([
         dbc.Row([
             dbc.Col(sidebar, xs=12, md=2, className="d-none d-md-block"),  # Sidebar column
             dbc.Col([
-                # Home Page Div
                 html.Div(id='home-page', children=home_page, style={'display': 'block'}),
                 
-                # Speeches Page Div
                 html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
                 
-                # Participation Page Div
                 html.Div(id='participation-page', children=participation_layout(), style={'display': 'none'}),
+
+                html.Div(id='questions-page', children=questions_layout(), style={'display': 'none'}),
 
                 html.Div(id='demographics-page', children=demographics_layout(), style={'display': 'none'}),
 
@@ -117,6 +117,7 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home-page', 'style'),
                 "participation": Output('participation-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
+                "questions": Output('questions-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
                 "methodology": Output('methodology-page', 'style'),
                 "about": Output('about-page', 'style'),
@@ -158,6 +159,7 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 participation_callbacks(app, data)
 speeches_callbacks(app, data)
+questions_callbacks(app, data)
 demographics_callbacks(app, data)
 
 # Run the app
