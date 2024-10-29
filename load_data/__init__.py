@@ -141,15 +141,23 @@ def load_demographics():
 
 def load_questions():
     job = gbq_client.query("""
-                       with cte as (SELECT ministry_addressed, member_party, count(ministry_addressed) as count_questions
-                        FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
-                        where is_primary_question
-                        and member_party is not NULL
-                        and ministry_addressed is not NULL
-                        group by member_party, ministry_addressed
-                        )
-                        select *, round(100*count_questions / sum(count_questions) over (partition by member_party), 2) as prop_questions
-                        from cte
+                       with by_parl_questions as (SELECT member_name, cast(parliament as STRING) as parliament, member_constituency, member_party, ministry_addressed, count(*) as count_questions
+FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
+where is_primary_question
+and member_party is not NULL
+and ministry_addressed is not NULL
+group by member_name, parliament, member_constituency, member_party, ministry_addressed
+),
+all_parl_questions as (SELECT member_name, 'All' as parliament, 'All' as member_constituency, member_party, ministry_addressed, count(*) as count_questions
+FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
+where is_primary_question
+and member_party is not NULL
+and ministry_addressed is not NULL
+group by member_name, member_party, ministry_addressed
+)
+select * from by_parl_questions
+union all
+select * from all_parl_questions
     """)
     result = job.result()
     return result.to_dataframe()
