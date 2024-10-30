@@ -1,10 +1,10 @@
-from dash import html, dcc, Input, Output, dash_table
+from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions
 
-# participation layout with dropdowns, graph, and table
+# participation layout with dropdowns, graph
 def participation_layout():
     return html.Div(
         [
@@ -120,74 +120,6 @@ def participation_layout():
                     )
                 ], width=12)
             ]),
-            
-            # Table Section with Scroll
-            dbc.Row([
-                dbc.Col([
-                    html.H2("Participation and Attendance"),
-                    dash_table.DataTable(
-                        id='participation-summary-table',
-                        columns=[
-                            {"name": "Parl.no", "id": "parliament"},
-                            {"name": "Party", "id": "member_party"},
-                            {"name": "Constituency", "id": "member_constituency"},
-                            {"name": "Member Name", "id": "member_name"},
-                            {"name": "Attendance", "id": "attendance"},
-                            {"name": "Participation", "id": "participation"},
-                        ],
-                        data=[],  # Will be populated via callback
-                        page_size=10,
-                        style_table={'overflowX': 'auto', 'maxHeight': '400px', 'overflowY': 'auto'},
-                        style_cell={
-                            'textAlign': 'left',
-                            'whiteSpace': 'normal',
-                            'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            'fontSize': '12px',
-                            'fontFamily': 'Roboto, sans-serif'
-                        },
-                        style_cell_conditional=[
-                            {
-                                'if': {'column_id': 'parliament'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                            {
-                                'if': {'column_id': 'member_party'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                            {
-                                'if': {'column_id': 'member_constituency'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                            {
-                                'if': {'column_id': 'member_name'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                            {
-                                'if': {'column_id': 'attendance'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                            {
-                                'if': {'column_id': 'participation'},
-                                'width': '16%',
-                                'minWidth': '100px',
-                                'maxWidth': '150px',
-                            },
-                        ],
-                        style_data={'height': 'auto'},
-                    )
-                ], width=12)
-            ], className="mt-4"),
         ],
         className='content'
     )
@@ -245,15 +177,14 @@ def participation_callbacks(app, data):
         options = [{'label': 'All', 'value': 'All'}] + [{'label': member, 'value': member} for member in members]
         return options, 'All'
 
-    # Callback to update the participation graph and table on Page 1
+    # Callback to update the participation graph
     @app.callback(
-        [Output('participation-graph', 'figure'),
-        Output('participation-summary-table', 'data')],
+        Output('participation-graph', 'figure'),
         [Input('parliament-dropdown-participation', 'value'),
         Input('constituency-dropdown-participation', 'value'),
         Input('member-dropdown-participation', 'value')]
     )
-    def update_graph_and_table(selected_parliament, selected_constituency, selected_member):
+    def update_graph(selected_parliament, selected_constituency, selected_member):
         participation_df = data['participation']
 
         # Filter by parliament
@@ -316,7 +247,4 @@ def participation_callbacks(app, data):
                               template='plotly_white'
         )
         
-        # Prepare table data
-        table_data = participation_df_highlighted.to_dict('records')
-        
-        return fig, table_data
+        return fig
