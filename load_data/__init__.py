@@ -87,7 +87,7 @@ where member_constituency is not NULL
     return result.to_dataframe()
 
 def load_speech_summary():
-
+    # limit to 5000 for now since in app this is very slow and prevents the page from generating
     job = gbq_client.query("""
                        SELECT parliament, `date`, member_party, b.member_constituency, member_name, speech_summary, topic_assigned
                         FROM `singapore-parliament-speeches.prod_mart.mart_speech_summaries`
@@ -96,6 +96,7 @@ def load_speech_summary():
                         using (member_name, member_party, parliament)
                         using (speech_id)
                         where b.member_constituency is not NULL
+                        limit 5000
     """)
     result = job.result()
     return result.to_dataframe()
