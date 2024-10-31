@@ -92,17 +92,15 @@ def speeches_layout():
                         [
                             html.P(
                                 [
-                                    "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does include written answers, parliamentary questions, or the President's address.",
+                                    "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does include written answers, parliamentary questions, or the President's address. Members who made no speeches do not appear on the graph. ",
                                     html.Br(),
                                     html.Br(),
-                                    "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info.",
-                                    html.Br(),
-                                    "Readability score is Flesch-Kincaid score...Members who did not speak do not have a readability score and will not appear on the graph. For example, Halimah Yacob (PAP) was in the 13th Parliament from xx to xx before contesting for the Presidency. During that time she made no speeches and therefore does not appear on the graph for that Parliament."
+                                    "We use the Flesch-Kincaid score to measure a speech's readability. It is a well-known tool for measuring how difficult a text is to understand in English and scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. The full formula and interpretation guide can be found in the methodology section. Members who did not speak do not have a readability score and will not appear on the graph. For example, Halimah Yacob (PAP) was in the 13th Parliament from xx to xx before contesting for the Presidency. During that time she made no speeches and therefore does not appear on the graph for that Parliament."
                                 ]
                             )
                         ],
                         title=html.Span(
-                            "How is a speech or question defined?",
+                            "How are speech and readability score defined?",
                             style={
                                 "fontWeight": "bold",
                                 "fontSize": "1.1rem"  # Optional: Increase font size
