@@ -6,6 +6,7 @@ from dash_iconify import DashIconify
 home_page = html.Div(
     [
         html.H2("Find out what's going on in the SG Parliament!"),
+        html.P("Note that this is still a work in progress!"),
     ]
 )
 
