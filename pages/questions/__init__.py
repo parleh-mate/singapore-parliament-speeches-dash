@@ -181,7 +181,7 @@ def questions_callbacks(app, data):
 
         # grouping and aggregation here instead of SQL to retain member name information for filtering first
 
-        questions_ministry_df = questions_ministry_df.groupby(['member_party', 'ministry_addressed']).agg({'count_questions': 'sum', 'count_questions': 'sum'}).reset_index()
+        questions_ministry_df = questions_ministry_df.groupby(['member_party', 'ministry_addressed']).agg({'count_questions': 'sum'}).reset_index()
 
         questions_ministry_df['perc_questions'] = questions_ministry_df['count_questions']*100 / questions_ministry_df.groupby('member_party')['count_questions'].transform('sum')
 
@@ -192,13 +192,13 @@ def questions_callbacks(app, data):
         unique_parties = sorted(full_questions_asked_df['member_party'].unique())
         party_to_num = {party: idx for idx, party in enumerate(unique_parties)}
 
-        fig = go.Figure()
+        fig_scatter = go.Figure()
 
         # plot boxplot across all datapoints for each party
 
         for party in unique_parties:
             plot_df = questions_asked_df[questions_asked_df['member_party'] == party]
-            fig.add_trace(
+            fig_scatter.add_trace(
                 go.Box(
                     x=plot_df['member_party'].map(party_to_num),  # Set numerical x position
                     y=plot_df['questions_per_sitting'],
@@ -223,7 +223,7 @@ def questions_callbacks(app, data):
             jitter = np.random.uniform(-0.1, 0.1, size=len(plot_df)) 
             scatter_x = [party_num + j for j in jitter]
             
-            fig.add_trace(
+            fig_scatter.add_trace(
                 go.Scatter(
                     x=scatter_x,  # Apply jitter to numerical x positions
                     y=plot_df['questions_per_sitting'],
@@ -251,7 +251,7 @@ def questions_callbacks(app, data):
             jitter = np.random.uniform(-0.1, 0.1, size=len(plot_df))  # Adjust jitter range as needed
             scatter_x = [party_num + j for j in jitter]
             
-            fig.add_trace(
+            fig_scatter.add_trace(
                 go.Scatter(
                     x=scatter_x,  # Apply jitter to numerical x positions
                     y=plot_df['questions_per_sitting'],
@@ -275,7 +275,7 @@ def questions_callbacks(app, data):
 
         # customize layout
 
-        fig.update_layout(
+        fig_scatter.update_layout(
             height=600,
             legend=dict(title=dict(text='Party'),
                         yanchor="top",
@@ -433,4 +433,4 @@ def questions_callbacks(app, data):
 
         fig_count.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
         
-        return fig, fig_count
+        return fig_scatter, fig_count

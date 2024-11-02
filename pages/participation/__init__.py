@@ -93,7 +93,7 @@ def participation_layout():
                                 "Attendance is measured by the number of sessions the member attended (or was present in) out of the total number of sessions which occurred while they were sitting as a member. For example, WP's Lee Li Lian won the Punggol East SMC by-election in January 2013 as the 12th parliament was underway. Her attendance is calculated as the proportion of the remaining 80 sittings she was qualified to attend instead of the total 89.",
                                 html.Br(),
                                 html.Br(),
-                                "Participation is measured by the number of sessions in which the member spoke at least once as a proportion of the number of sessions the member attended. For example, in the 13th parliament Walter Theseira (NMP) had a participation rate of 94.2%, , meaning that he spoke in 94.2% of the of 98.1% of sessions he attended. Please refer to the methodology for more info."
+                                "Participation is measured by the number of sessions in which the member spoke at least once as a proportion of the number of sessions the member attended. For example, in the 13th parliament Walter Theseira (NMP) had a participation rate of 94.2%, meaning that he spoke in 94.2% of the of 98.1% of sessions he attended. Please refer to the methodology for more info."
                             ])
                         ],
                         title=html.Span(
