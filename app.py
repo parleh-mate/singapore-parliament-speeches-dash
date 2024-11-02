@@ -8,13 +8,14 @@ from datetime import datetime, timedelta
 
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
+from pages.topics import topics_callbacks, topics_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.questions import questions_callbacks, questions_layout
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
 
-from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics, load_questions
+from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics, load_questions, load_topics
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
@@ -31,7 +32,7 @@ gmt_plus_8 = pytz.timezone('Asia/Singapore')
 
 cache = Cache(server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': 'tmp/cache-directory'
+    'CACHE_DIR': '/tmp/cache-directory'
 })
 
 # Data fetching function
@@ -46,6 +47,7 @@ def get_data():
         data = {
             'participation': load_participation(),
             'speech_agg': load_speech_agg(),
+            'topics': load_topics(),
             'speech_summaries': load_speech_summary(),
             'demographics': load_demographics(),
             'questions': load_questions()
@@ -87,6 +89,8 @@ app.layout = html.Div([
                 html.Div(id='home-page', children=home_page, style={'display': 'block'}),
                 
                 html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
+
+                html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
                 
                 html.Div(id='participation-page', children=participation_layout(), style={'display': 'none'}),
 
@@ -117,6 +121,7 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home-page', 'style'),
                 "participation": Output('participation-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
+                "topics": Output('topics-page', 'style'),
                 "questions": Output('questions-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
                 "methodology": Output('methodology-page', 'style'),
@@ -159,6 +164,7 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 participation_callbacks(app, data)
 speeches_callbacks(app, data)
+topics_callbacks(app, data)
 questions_callbacks(app, data)
 demographics_callbacks(app, data)
 
