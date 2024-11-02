@@ -101,6 +101,35 @@ def load_speech_summary():
     result = job.result()
     return result.to_dataframe()
 
+def load_topics():
+
+    job = gbq_client.query("""
+                       with cte as (SELECT parliament, `date`, member_party, b.member_constituency, member_name, topic_assigned
+                        FROM `singapore-parliament-speeches.prod_mart.mart_speech_topics`
+                        left join (select * from `singapore-parliament-speeches.prod_mart.mart_speeches`) as a
+                        left join (select distinct member_name, member_party, parliament, member_constituency from `singapore-parliament-speeches.prod_agg.agg_speech_metrics_by_member`) as b
+                        using (member_name, member_party, parliament)
+                        using (speech_id)
+                        where b.member_constituency is not NULL
+                        ),
+                        by_parl as(
+                        select cast(parliament as STRING) as parliament, member_party, member_constituency, member_name, topic_assigned, count(*) as count_speeches
+                        from cte
+                        group by parliament, member_party, member_constituency, member_name, topic_assigned
+                        ),
+                        all_parl as(
+                        select 'All' as parliament, member_party, 'All' as member_constituency, member_name, topic_assigned, count(*) as count_speeches
+                        from cte
+                        group by member_party, member_name, topic_assigned
+                        )
+                        select * from by_parl
+                        union all
+                        select * from all_parl
+
+    """)
+    result = job.result()
+    return result.to_dataframe()
+
 def load_participation():
     job = gbq_client.query("""
                        with by_parl as (
