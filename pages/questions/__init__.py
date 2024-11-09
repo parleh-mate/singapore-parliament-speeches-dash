@@ -15,7 +15,37 @@ def questions_layout():
             # Dropdowns Section
             dbc.Row([
                 dbc.Col([
-                    html.Label("Select a Parliament Session:"),
+                    # Container for the Label and Info Icon
+                    html.Div(
+                        [
+                            html.Label("Select a Parliament Session:"),
+                            html.Span(
+                                # Info Icon (Bootstrap Icons)
+                                html.I(
+                                    className="bi bi-info-circle",  # Bootstrap Icon classes
+                                    id="questions_parliament-session-info-icon",  # Unique ID for the tooltip
+                                    style={
+                                        "margin-left": "5px",          # Space between label and icon
+                                        "cursor": "pointer",           # Pointer cursor on hover
+                                        "color": "#17a2b8",            # Bootstrap's info color
+                                        "fontSize": "1rem"             # Icon size
+                                    }
+                                    # Removed aria_label as it may not be supported directly
+                                )
+                            )
+                        ],
+                        style={"display": "flex", "alignItems": "center"}  # Align label and icon vertically
+                    ),
+                                        # Tooltip Component
+                    dbc.Tooltip(
+                        "'All' takes the average across all parliamentary sittings from the 12th parliament to current",
+                        target="questions_parliament-session-info-icon",  # Link tooltip to the icon's ID
+                        placement="right",                      # Position the tooltip to the right of the icon
+                        style={
+                            "maxWidth": "300px",
+                            "textAlign": "left"  # Ensure text is left-aligned within the tooltip
+                        }
+                    ),
                     dcc.Dropdown(
                         id='parliament-dropdown-questions',
                         options=[{'label': session, 'value': session} for session in parliament_sessions],

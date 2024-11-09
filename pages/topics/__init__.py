@@ -14,7 +14,37 @@ def topics_layout():
             # Dropdowns Section
             dbc.Row([
                 dbc.Col([
-                    html.Label("Select a Parliament Session:"),
+                    # Container for the Label and Info Icon
+                    html.Div(
+                        [
+                            html.Label("Select a Parliament Session:"),
+                            html.Span(
+                                # Info Icon (Bootstrap Icons)
+                                html.I(
+                                    className="bi bi-info-circle",  # Bootstrap Icon classes
+                                    id="topics_parliament-session-info-icon",  # Unique ID for the tooltip
+                                    style={
+                                        "margin-left": "5px",          # Space between label and icon
+                                        "cursor": "pointer",           # Pointer cursor on hover
+                                        "color": "#17a2b8",            # Bootstrap's info color
+                                        "fontSize": "1rem"             # Icon size
+                                    }
+                                    # Removed aria_label as it may not be supported directly
+                                )
+                            )
+                        ],
+                        style={"display": "flex", "alignItems": "center"}  # Align label and icon vertically
+                    ),
+                                        # Tooltip Component
+                    dbc.Tooltip(
+                        "'All' takes all labelled speeches from the 12th parliament to current",
+                        target="topics_parliament-session-info-icon",  # Link tooltip to the icon's ID
+                        placement="right",                      # Position the tooltip to the right of the icon
+                        style={
+                            "maxWidth": "300px",
+                            "textAlign": "left"  # Ensure text is left-aligned within the tooltip
+                        }
+                    ),
                     dcc.Dropdown(
                         id='parliament-dropdown-topics',
                         options=[{'label': session, 'value': session} for session in parliament_sessions],
@@ -22,7 +52,7 @@ def topics_layout():
                         placeholder='Select a parliament session',
                         searchable=False,
                         clearable=False
-                    ),
+                    )
                 ], md=4),
                 dbc.Col([
                     html.Label("Select a Constituency:"),
@@ -53,7 +83,7 @@ def topics_layout():
                         [
                             html.P(
                                 [
-                                    "Topics are assigned to speeches by GPT based on a set list of topics generated using a combination of unsupervised modeling and subjective human interpretation of model outputs. This is early stage work and we are working on engineering prompts or fine tuning models to return more valid results. More information can be found in the methodology section."
+                                    "Note that speeches here refer only to speeches that were summarized and labelled by GPT and do not include written answers, parliamentary questions, the President's address, or speeches whose length fall outside of a pre-defined range. Topics are assigned to speeches by GPT based on a set list of topics generated using a combination of unsupervised modeling and subjective human interpretation of model outputs. This is early stage work and we are working on engineering prompts or fine tuning models to return more valid results. Please refer to the methodology for more info."
                                 ]
                             )
                         ],
