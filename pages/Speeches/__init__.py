@@ -95,7 +95,7 @@ def speeches_layout():
                                     "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does not include written answers, parliamentary questions, or the President's address. Members who made no speeches do not appear on the graph.",
                                     html.Br(),
                                     html.Br(),
-                                    "To assess how readable a speech is, we use the Flesch-Kincaid score, a well-known index for measuring how difficult a text is to understand in English. The index scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. The full formula and interpretation guide can be found in the methodology section. Members who did not speak do not have a readability score and will not appear on the graph."
+                                    "To assess how readable a speech is, we use the Flesch-Kincaid score, a well-known index for measuring how difficult a text is to understand in English. The index scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. The full formula and interpretation guide can be found in the methodology section. Members who did not speak do not have a readability score and will not appear on the graph. Please refer to the methodology for more info."
                                 ]
                             )
                         ],
@@ -216,6 +216,7 @@ def speeches_layout():
                             },
                         ],
                         style_data={'height': 'auto'},
+                        filter_action='native',
                     )
                 ], width=12)
             ], className="mt-4"),
