@@ -93,12 +93,15 @@ def demographics_callbacks(app, data):
         demographics_df = data['demographics']
 
         # Filter by parliament
-        demographics_df = demographics_df[demographics_df['parliament'] == int(parliaments_demo[selected_parliament])]    
+        demographics_df = demographics_df[demographics_df['parliament'] == int(parliaments_demo[selected_parliament])]
+
+        # add all parties
+        demographics_hist_df = pd.concat([demographics_df, demographics_df.assign(party='All')])
         
         # age histogram
         # Create the histogram
         age_histogram = px.histogram(
-            demographics_df,
+            demographics_hist_df,
             x='year_age_entered',
             color='party', 
             opacity=0.75,
@@ -133,6 +136,7 @@ def demographics_callbacks(app, data):
         # Loop through each party and calculate KDE
         unique_parties = list(demographics_df['party'].unique())
         unique_parties.append("All")
+        
         for party in unique_parties:
             # Filter the data for each party
             if party=="All":
@@ -207,23 +211,6 @@ def demographics_callbacks(app, data):
         # Create buttons
         buttons = [
             dict(
-                label="Percentage",
-                method="update",
-                args=[
-                    {"visible": [True]*num_hist_traces + [False]*num_kde_traces},
-                    {
-                        "title": "Age Distribution by Party",
-                        "xaxis": {"title": "Year-age at first sitting",
-                                  "tick0": min_tick,
-                                  "dtick": 5,
-                                  "tickvals": tickvals,
-                                  "range": [min_tick, max_tick]
-                                  },
-                        "yaxis": {"title": "Percentage"}
-                    }
-                ]
-            ),
-            dict(
                 label="Density",
                 method="update",
                 args=[
@@ -239,6 +226,23 @@ def demographics_callbacks(app, data):
                         "yaxis": {"title": "Density",
                                   "ticks": "",
                                   "showticklabels": False}
+                    }
+                ]
+            ),
+            dict(
+                label="Percentage",
+                method="update",
+                args=[
+                    {"visible": [True]*num_hist_traces + [False]*num_kde_traces},
+                    {
+                        "title": "Age Distribution by Party",
+                        "xaxis": {"title": "Year-age at first sitting",
+                                  "tick0": min_tick,
+                                  "dtick": 5,
+                                  "tickvals": tickvals,
+                                  "range": [min_tick, max_tick]
+                                  },
+                        "yaxis": {"title": "Percentage"}
                     }
                 ]
             )
@@ -270,9 +274,9 @@ def demographics_callbacks(app, data):
 
         # Set initial visibility (e.g., show histogram by default)
         for i in range(num_hist_traces):
-            combined_fig.data[i].visible = True
+            combined_fig.data[i].visible = False
         for i in range(num_kde_traces):
-            combined_fig.data[num_hist_traces + i].visible = False
+            combined_fig.data[num_hist_traces + i].visible = True
 
         # Optionally, update axes and layout as needed
         combined_fig.update_layout(
