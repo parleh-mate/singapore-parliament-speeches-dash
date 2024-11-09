@@ -7,6 +7,7 @@ PARTY_COLOURS = {
     "WP": "#99CCFF",  # pastel blue
     "NMP": "#BAFFC9",  # pastel green
     "SPP": "#D8BFD8",  # pastel purple
+    "All": '#FF964F' # pastel orange
 }
 
 # Define parliaments

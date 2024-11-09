@@ -131,9 +131,15 @@ def demographics_callbacks(app, data):
         age_density = go.Figure()
 
         # Loop through each party and calculate KDE
-        for party in demographics_df['party'].unique():
+        unique_parties = list(demographics_df['party'].unique())
+        unique_parties.append("All")
+        for party in unique_parties:
             # Filter the data for each party
-            party_data = demographics_df[demographics_df['party'] == party]['year_age_entered']
+            if party=="All":
+                party_data = demographics_df['year_age_entered']
+            else:
+                party_data = demographics_df[demographics_df['party'] == party]['year_age_entered']
+                
             buffer = 15
 
             if len(party_data)!=1:
