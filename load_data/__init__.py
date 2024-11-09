@@ -191,4 +191,27 @@ select * from all_parl_questions
     """)
     result = job.result()
     return result.to_dataframe()
+
+
+def load_gpt_prompts():
+    job = gbq_client.query("""
+                       SELECT system_message, output_summary_description, output_topic_description 
+FROM `singapore-parliament-speeches.prod_dim.dim_speech_summaries`
+order by batch_id desc
+limit 1
+    """)
+    result = job.result()
+    return result.to_dataframe()
+
+def load_speech_lengths():
+    job = gbq_client.query("""
+                       SELECT count_speeches_words
+FROM `singapore-parliament-speeches.prod_mart.mart_speeches`
+WHERE topic_type_name not like "%Correction by Written Statements%"
+AND topic_type_name not like "%Bill Introduced%"
+AND member_name != ''
+AND member_name != 'Speaker'
+    """)
+    result = job.result()
+    return result.to_dataframe()
     
