@@ -142,7 +142,7 @@ for x, text in zip(x_coords, text_labels):
 
 # Update the layout
 fig.update_layout(
-    title="Density of Speech Lengths",
+    title="Density of Speech Lengths" + '<br>' + '<span style="font-size:12px; color:grey">X-axis is log scaled</span>',
     xaxis_title="Number of Words",
     yaxis_title="Density",
     xaxis_type="log",
