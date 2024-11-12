@@ -61,7 +61,7 @@ def topics_layout():
                         options=[],  # Will be populated via callback
                         value='All',
                         placeholder='Select a constituency',
-                        searchable=False,
+                        searchable=True,
                         clearable=False
                     )
                 ], md=4, id='constituency-dropdown-container-topics', style={'display': 'none'}),
