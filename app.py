@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
+from pages.summaries import summaries_callbacks, summaries_layout
 from pages.topics import topics_callbacks, topics_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.questions import questions_callbacks, questions_layout
@@ -90,6 +91,8 @@ app.layout = html.Div([
                 
                 html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
 
+                html.Div(id='summaries-page', children=summaries_layout(), style={'display': 'none'}),
+
                 html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
                 
                 html.Div(id='participation-page', children=participation_layout(), style={'display': 'none'}),
@@ -121,6 +124,7 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home-page', 'style'),
                 "participation": Output('participation-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
+                "summaries": Output('summaries-page', 'style'),
                 "topics": Output('topics-page', 'style'),
                 "questions": Output('questions-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
@@ -164,6 +168,7 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 participation_callbacks(app, data)
 speeches_callbacks(app, data)
+summaries_callbacks(app, data)
 topics_callbacks(app, data)
 questions_callbacks(app, data)
 demographics_callbacks(app, data)
