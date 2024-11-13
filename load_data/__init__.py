@@ -89,13 +89,11 @@ where member_constituency is not NULL
 def load_speech_summary():
     # limit to 5000 for now since in app this is very slow and prevents the page from generating
     job = gbq_client.query("""
-                       SELECT parliament, `date`, member_party, b.member_constituency, member_name, speech_summary, topic_assigned
+                       SELECT parliament, `date`, member_party, member_constituency, member_name, speech_summary, topic_assigned
                         FROM `singapore-parliament-speeches.prod_mart.mart_speech_summaries`
-                        left join (select * from `singapore-parliament-speeches.prod_mart.mart_speeches`) as a
-                        left join (select distinct member_name, member_party, parliament, member_constituency from `singapore-parliament-speeches.prod_agg.agg_speech_metrics_by_member`) as b
-                        using (member_name, member_party, parliament)
+                        left join (select * from `singapore-parliament-speeches.prod_mart.mart_speeches`)
                         using (speech_id)
-                        where b.member_constituency is not NULL
+                        where member_constituency is not NULL
                         limit 5000
     """)
     result = job.result()

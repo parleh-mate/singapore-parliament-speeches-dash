@@ -240,7 +240,7 @@ def methodology_layout():
                             ),
                         html.P([
                             html.Br(),
-                            "The speech is from a sitting in the 12th Parliament by Sim Ann (PAP). It is clearly procedural in nature and is both too short and not substantive enough to be summarized. Ultimately 70 words corresponds to about a 30-second speech which we do not believe conveys much information even if substantive in nature. Imposing a strict word-limit is also much quicker than manually going through each speech to determine if they are substantive. The following graph highlights the distribution of speech lengths and what we exclude in our summaries. We end up excluding xx% of speeches.",
+                            "The speech is from a sitting in the 12th Parliament by Sim Ann (PAP) and is an example of something that is procedural and too unsubstantive to be worth summarizing. Ultimately 70 words corresponds to about a 30-second speech which we do not believe conveys much information even if substantive in nature. Imposing a strict word-limit is also much quicker than manually going through each speech to determine if they are substantive. The following graph highlights the distribution of speech lengths and what we exclude in our summaries.",
                             dcc.Graph(
                                 id='speeches-length-graph',
                                 figure=fig,
