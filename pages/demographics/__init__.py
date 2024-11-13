@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import gaussian_kde, norm
 
-from utils import PARTY_COLOURS, parliaments, parliament_sessions
+from utils import PARTY_COLOURS, ETHNIC_COLOURS, parliaments, parliament_sessions
 
 parliaments_demo = {i:v for i,v in parliaments.items() if i!='All'}
 
@@ -296,64 +296,58 @@ def demographics_callbacks(app, data):
 
         # ethnicity and gender graph
 
-        ethnicity_df = demographics_df.groupby(['party', 'member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
+        ethnicity_parties = demographics_df.groupby(['party', 'member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
+
+        all_parties = list(ethnicity_parties.party.unique())
+        all_parties.sort(reverse=True)
+
+        # get for all parties
+        ethnicity_all = demographics_df.groupby(['member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
+
+        ethnicity_all['party'] = 'All'
+
+        ethnicity_df = pd.concat([ethnicity_parties, ethnicity_all])
 
         ethnicity_df['percentage'] = ethnicity_df['count']*100 / ethnicity_df.groupby('party')['count'].transform('sum')
 
-        custom_order = ['chinese', 'malay', 'indian', 'others']
-        ethnicity_df['member_ethnicity'] = pd.Categorical(ethnicity_df['member_ethnicity'], categories=custom_order, ordered=True)
+        ethnicity_df['member_ethnicity'] = pd.Categorical(ethnicity_df['member_ethnicity'], categories=['chinese', 'malay', 'indian', 'others'], ordered=True)
 
         ethnicity_df = ethnicity_df.sort_values('member_ethnicity')
 
-        # Create x-axis structure: ethnicity (x[0]) and party (x[1]) information
-        x = [list(ethnicity_df['member_ethnicity'].values), list(ethnicity_df['party'].values)]
+        ethnicity_fig = px.bar(
+            ethnicity_df, 
+            x="percentage", 
+            y="party", 
+            custom_data=["member_ethnicity", "gender", "count"],
+            color="member_ethnicity",
+            pattern_shape="gender",
+            pattern_shape_sequence=["", "x"],
+            category_orders={"gender": ["M", "F"]},
+            color_discrete_map=ETHNIC_COLOURS
+            )
 
-        # Create figure
-        ethnicity_fig = go.Figure()
-
-        # Define patterns for genders
-        gender_patterns = {'F': '/', 'M': ''}
-
-        # Loop through gender and set patterns for each
-        for gender, pattern in gender_patterns.items():
-            # Create a temporary dataframe where the current gender is active
-            df_tmp = ethnicity_df.mask(ethnicity_df['gender'] != gender, pd.NA)
-
-            # Loop through parties and add bars
-            for party in ethnicity_df['party'].unique():
-                # Mask the data for the current party
-                y = df_tmp['percentage'].mask(ethnicity_df['party'] != party, pd.NA)
-
-                # Add a trace for each party and gender
-                ethnicity_fig.add_bar(
-                    x=x,  # X-axis is ethnicity and party combination
-                    y=y,  # Proportion as the y value
-                    name=f'{party} - {gender}',  # Trace name
-                    hovertext=ethnicity_df['gender'],  # Display gender info in hover
-                    marker_pattern_shape=pattern,  # Apply the pattern based on gender
-                    marker_color=PARTY_COLOURS[party],  # Use the custom color for the party
-                    hovertemplate="<b>Ethnicity:</b> %{x[0]}<br>" +
-                                "<b>Party:</b> %{x[1]}<br>" +
-                                "<b>Percentage:</b> %{y:.1f}<br>" +
-                                "<b>Gender:</b> %{hovertext}<extra></extra>"
-                )
-
-        # Final layout adjustments
         ethnicity_fig.update_layout(
-            barmode='relative',  # Group the bars by party
             title='Ethnic and Gender Distribution by Party',
-            xaxis_title='Ethnicity',
-            yaxis_title='Percentage',
+            yaxis_title='Party',
+            xaxis_title='Percentage',
             showlegend=True,
             margin=dict(l=0, r=0),
             legend=dict(
-                title=dict(text='Party - Gender'),
-                yanchor="top",
-                y=0.99,
-                xanchor="right",
-                x=0.99
+                title=dict(text='Ethnicity, Gender')
             ),
+            #yaxis={'categoryorder': 'total ascending'},
+            yaxis = {"categoryorder": 'array',
+                     "categoryarray": all_parties.append('All')},
             template='plotly_white'
-        )       
+                )    
         
+        ethnicity_fig.update_traces(
+            hovertemplate=
+                'Ethnicity: %{customdata[0]}<br>' +
+                'Gender: %{customdata[1]}<br>' +
+                'Party: %{y}<br>' +
+                'Percentage: %{x:.1f}<br>' +
+                'Count:  %{customdata[2]}<extra></extra>'  # Removes the secondary box with trace name
+        )
+ 
         return combined_fig, ethnicity_fig

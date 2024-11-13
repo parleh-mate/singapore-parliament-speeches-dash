@@ -2,12 +2,19 @@
 # party colors for speeches graph
 
 PARTY_COLOURS = {
+    "All": '#FF964F', # pastel orange
     "PAP": "#FF9999",  # pastel red
     "PSP": "#FFFF99",  # pastel yellow
     "WP": "#99CCFF",  # pastel blue
     "NMP": "#BAFFC9",  # pastel green
-    "SPP": "#D8BFD8",  # pastel purple
-    "All": '#FF964F' # pastel orange
+    "SPP": "#D8BFD8"  # pastel purple
+}
+
+ETHNIC_COLOURS = {
+    "chinese": "#FFCBDB",  # pastel pink
+    "malay": "#6CD0D0",  # pastel turquoise
+    "indian": "#B1DDC9",  # pastel green
+    "others": "#FBCEB1",  # pastel orange
 }
 
 # Define parliaments
