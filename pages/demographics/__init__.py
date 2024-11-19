@@ -281,7 +281,7 @@ def demographics_callbacks(app, data):
         # Optionally, update axes and layout as needed
         combined_fig.update_layout(
             xaxis_title="Year-age at first sitting",
-            yaxis_title="Percentage",
+            yaxis_title="Density",
             title="Age Distribution by Party",
             margin=dict(l=0, r=0),
             legend=dict(
@@ -293,6 +293,9 @@ def demographics_callbacks(app, data):
             ),
             template='plotly_white'
         )
+
+        combined_fig.update_yaxes(ticks = "",
+                                  showticklabels= False)
 
         # ethnicity and gender graph
 
