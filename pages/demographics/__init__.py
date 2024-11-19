@@ -303,6 +303,7 @@ def demographics_callbacks(app, data):
 
         all_parties = list(ethnicity_parties.party.unique())
         all_parties.sort(reverse=True)
+        all_parties.append('All')
 
         # get for all parties
         ethnicity_all = demographics_df.groupby(['member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
@@ -340,7 +341,7 @@ def demographics_callbacks(app, data):
             ),
             #yaxis={'categoryorder': 'total ascending'},
             yaxis = {"categoryorder": 'array',
-                     "categoryarray": all_parties.append('All')},
+                     "categoryarray": all_parties},
             template='plotly_white'
                 )    
         
