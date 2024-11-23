@@ -4,6 +4,7 @@ import os
 # Set Google Cloud credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "tokens/gcp_token.json"
 
+# gbq_client
 gbq_client = bigquery.Client()
 
 def load_speech_agg():
@@ -211,5 +212,4 @@ AND member_name != ''
 AND member_name != 'Speaker'
     """)
     result = job.result()
-    return result.to_dataframe()
-    
+    return result.to_dataframe()   
