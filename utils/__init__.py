@@ -24,6 +24,12 @@ parliaments = {
     "All": 'All'
 }
 
+parliament_parties = {
+    '12': ['NMP', 'PAP', 'PSP', 'WP'],
+    '13': ['NMP', 'PAP', 'WP'],
+    '14': ['NMP', 'SPP', 'PAP', 'WP']
+}
+
 parliament_sessions = sorted(parliaments.keys(), reverse=True)
 
 # query embedding model
@@ -39,7 +45,10 @@ def get_response_format(query):
 
     2. Gather all summaries that are deemed relevant and from these, extract information on the party's policy position on the query. Summarize these into a coherent policy approach by the party on the issue.
 
-    3. In the case of esoteric queries, it may be the case that all summaries retrieved are irrelevant. In this case, do not hallucinate non-existent policy positions. Instead, return an output saying 'Your query did not return any relevant speeches, please try again with something less specific.'"""
+    3. In the case of esoteric queries, it may be the case that all summaries retrieved are irrelevant. In this case, do not hallucinate non-existent policy positions. Instead, return an output saying 'Your query did not return any relevant speeches, please try again with something less specific.'
+
+    Writing style: Begin your summary with 'The Party's position on...' and the party should always be referred to as 'the Party' rather than the name of the party or 'the Government'. Write in concise manner, avoiding tautology.
+    """
 
     policy_point_description = "Based on the summary you have created for the description of the policy position, list short, specific bullet point examples of no more than 5 policies that justify your decision to summarize the party's policies in that specific way."
 

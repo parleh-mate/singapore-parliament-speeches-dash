@@ -49,6 +49,7 @@ sidebar_content = [
             dbc.NavLink("Participation", href="/participation", active="exact"),
             dbc.NavLink("Speeches", href="/speeches", active="exact"), 
             dbc.NavLink("Summaries", href="/summaries", active="exact"), 
+            dbc.NavLink("Topic Summaries", href="/topic_summaries", active="exact"), 
             #dbc.NavLink("Bills", href="/bills", active="exact"),
             dbc.NavLink("Topics", href="/topics", active="exact"), 
             dbc.NavLink("Questions", href="/questions", active="exact"),
