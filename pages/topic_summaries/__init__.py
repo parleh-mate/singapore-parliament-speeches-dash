@@ -4,9 +4,10 @@ import dash_bootstrap_components as dbc
 from query_vectors import query_vector_embeddings, summarize_policy_positions
 from utils import parliaments, parliament_parties, top_k_rag
 
-parliaments = {i:v for i,v in parliaments.items() if i!='All'}
+# Filter out the 'All' parliament session
+parliaments = {i: v for i, v in parliaments.items() if i != 'All'}
 
-# demographics layout with dropdowns, graph, and table
+# Layout for the Topic Summaries Page
 def topic_summaries_layout():
     return html.Div(
         [
@@ -41,11 +42,11 @@ def topic_summaries_layout():
                 
                 # Text Input
                 dbc.Col([
-                    html.Label("Enter Text:"),
+                    html.Label("Enter Query:"),
                     dbc.Input(
                         id='text-input-rag',
                         type='text',
-                        placeholder='Enter your text here',
+                        placeholder='Enter your query here',
                     )
                 ], md=4),
             ], className="mb-4"),
@@ -83,8 +84,13 @@ def topic_summaries_layout():
                 ], md=4)
             ], className="mb-4"),  # Moved className outside the children list
             
-            # Output Paragraph
-            html.Div(id='output-paragraph-rag', className='mt-4')
+            # Output Paragraph with Loading Icon
+            dcc.Loading(
+                id="loading-output-rag",
+                type="default",  # You can choose other types like 'circle', 'dot', etc.
+                children=html.Div(id='output-paragraph-rag', className='mt-4'),
+                style={'position': 'relative'}
+            )
         ],
         className='content'
     )
@@ -94,16 +100,22 @@ def topic_summaries_callbacks(app):
     # Callback to update Party options based on selected session
     @app.callback(
         [Output('party-dropdown-rag', 'options'),
-        Output('party-dropdown-rag', 'value')],
+         Output('party-dropdown-rag', 'value')],
         Input('parliament-dropdown-rag', 'value')
     )
     def update_party_options(selected_parliament):
-        
-        # Filter parties based on the selected parliament session
-        parties = parliament_parties[parliaments[selected_parliament]]
-        return parties, parties[0]
-    
-     # Callback to handle submit and display output paragraph
+        if selected_parliament:
+            # Retrieve parties for the selected parliament session
+            parties = parliament_parties.get(parliaments[selected_parliament], [])
+            # Format options for the dropdown
+            formatted_parties = [{'label': party, 'value': party} for party in parties]
+            # Set the default selected party to the first in the list
+            default_party = formatted_parties[0]['value'] if formatted_parties else None
+            return formatted_parties, default_party
+        # If no parliament selected, return empty options and no value
+        return [], None
+
+    # Callback to handle submit and display output paragraph
     @app.callback(
         Output('output-paragraph-rag', 'children'),
         Input('submit-button-rag', 'n_clicks'),
@@ -120,9 +132,9 @@ def topic_summaries_callbacks(app):
                 output = summarize_policy_positions(query, summaries)
                 # Ensure output has at least one element
                 if output and len(output) > 0:
-                    # return output:
+                    # Construct the returned text with Policy Position and Justification
                     returned_text = html.P([
-                            html.H3("Policy position"),
+                            html.H3("Policy Position"),
                             output[0],
                             html.Br(),
                             html.Br(),

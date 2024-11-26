@@ -66,4 +66,4 @@ def summarize_policy_positions(query, summaries):
         )
     
     output = eval(completion.choices[0].message.content)
-    return output['policy_position'], output['policy_points']
+    return output['policy_position'], output['policy_points'], output['retrieval_rate']

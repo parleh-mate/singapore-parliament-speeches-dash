@@ -37,6 +37,8 @@ embedding_model = "text-embedding-3-small"
 
 # get prompts for GPT summary
 
+system_prompt = "You are a non-partisan political analyst who will take summaries of speeches made in the Singapore parliament on a given topic and by a given party, and then output an overall summary of the party's political position on the issue and policy points that support your view."
+
 def get_response_format(query):
 
     policy_position_description = f"""Policy summary of the party's position on the issue '{query}' in no more than 150 words. Note that summaries passed to you are the top-k results from a RAG model and may not always be relevant to the query. I will provide a step by step guide to guide your summarization. 
@@ -52,12 +54,14 @@ def get_response_format(query):
 
     policy_point_description = "Based on the summary you have created for the description of the policy position, list short, specific bullet point examples of no more than 5 policies that justify your decision to summarize the party's policies in that specific way."
 
-    response_format = {"type": "json_schema", "json_schema": {"name": "response", "strict": True, "schema": {"type": "object", "properties": {"policy_position": {"type": "string", "description": policy_position_description}, "policy_points": {"type": "string", "description": policy_point_description}}, "required": ["policy_position", "policy_points"], "additionalProperties": False}}}
+    retrieval_rate_description = "A list of booleans corresponding to each summary that was passed to the model indicating if that summary was accepted as relevant or not. Output should be wrapped by parentheses and take the form of a Python list. For example [True, False, True, ...]"
+
+    response_format = {"type": "json_schema", "json_schema": {"name": "response", "strict": True, "schema": {"type": "object", "properties": {"policy_position": {"type": "string", "description": policy_position_description}, "policy_points": {"type": "string", "description": policy_point_description}, "retrieval_rate": {"type": "string", "description": retrieval_rate_description}}, "required": ["policy_position", "policy_points", "retrieval_rate"], "additionalProperties": False}}}
 
     return response_format
-
-system_prompt = "You are a non-partisan political analyst who will take summaries of speeches made in the Singapore parliament on a given topic and by a given party, and then output an overall summary of the party's political position on the issue and policy points that support your view."
 
 # top k for RAG
 
 top_k_rag = 50
+
+[x for x, y in zip(summaries, eval(output[2])) if y][-1:]
