@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.summaries import summaries_callbacks, summaries_layout
-from pages.topic_summaries import topic_summaries_callbacks, topic_summaries_layout
+from pages.policy_positions import policy_positions_callbacks, policy_positions_layout
 from pages.topics import topics_callbacks, topics_layout
 from pages.participation import participation_callbacks, participation_layout
 from pages.questions import questions_callbacks, questions_layout
@@ -94,7 +94,7 @@ app.layout = html.Div([
 
                 html.Div(id='summaries-page', children=summaries_layout(), style={'display': 'none'}),
 
-                html.Div(id='topic-summaries-page', children=topic_summaries_layout(), style={'display': 'none'}),
+                html.Div(id='policy-positions-page', children=policy_positions_layout(), style={'display': 'none'}),
 
                 html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
                 
@@ -128,7 +128,7 @@ page_outputs = {"home": Output('home-page', 'style'),
                 "participation": Output('participation-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
                 "summaries": Output('summaries-page', 'style'),
-                "topic_summaries": Output('topic-summaries-page', 'style'),
+                "policy_positions": Output('policy-positions-page', 'style'),
                 "topics": Output('topics-page', 'style'),
                 "questions": Output('questions-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
@@ -173,7 +173,7 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 participation_callbacks(app, data)
 speeches_callbacks(app, data)
 summaries_callbacks(app, data)
-topic_summaries_callbacks(app)
+policy_positions_callbacks(app, data)
 topics_callbacks(app, data)
 questions_callbacks(app, data)
 demographics_callbacks(app, data)

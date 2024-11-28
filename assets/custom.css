@@ -37,3 +37,16 @@
 body {
     color: black;
 }
+
+/* assets/styles.css */
+
+/* Typewriter Base Class */
+.typewriter-line {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #000; /* Ensure text is visible */
+    display: inline-block; /* Necessary for caret positioning */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflowing text */
+    /* Remove border-right to eliminate large caret */
+}
