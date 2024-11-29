@@ -1,11 +1,8 @@
 from dash import html, dcc, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 import dash
-from flask_caching import Cache
-import logging
-import pytz
-from datetime import datetime, timedelta
 
+from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
 from pages.policy_positions import policy_positions_callbacks, policy_positions_layout
@@ -16,57 +13,12 @@ from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
 
-from load_data import load_participation, load_speech_agg, load_demographics, load_questions, load_topics
-
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
                                                 "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
 ], suppress_callback_exceptions=True)
+
 server = app.server  # Expose the Flask app as a variable
-
-# Initialize logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-# set time
-gmt_plus_8 = pytz.timezone('Asia/Singapore')
-
-cache = Cache(server, config={
-    'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/tmp/cache-directory'
-})
-
-# Data fetching function
-def get_data():
-    data = cache.get('all_data')
-
-    if data is not None:
-        logger.debug(f"{datetime.now()} - Data fetched from cache")
-        return data
-    else:
-        logger.debug(f"{datetime.now()} - Data fetched from BigQuery")
-        data = {
-            'participation': load_participation(),
-            'speech_agg': load_speech_agg(),
-            'topics': load_topics(),
-            'demographics': load_demographics(),
-            'questions': load_questions()
-        }
-
-        current_time = datetime.now(gmt_plus_8)
-        # Create a datetime object for next 1:00 AM
-        today_1am = current_time.replace(hour=1, minute=0, second=0, microsecond=0)
-        if current_time < today_1am and current_time >= (today_1am - timedelta(hours=1)):
-            next_1am = today_1am
-        else:
-            next_1am = today_1am + timedelta(days=1)
-
-        # set cached data to expire at next 1am
-        cache.set('all_data', data, timeout = (next_1am - current_time).seconds)
-        cache.set('time_loaded', datetime.now(gmt_plus_8))
-        return data
-
-data = get_data()
 
 # Offcanvas for mobile
 offcanvas = dbc.Offcanvas(
