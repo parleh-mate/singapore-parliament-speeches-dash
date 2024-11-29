@@ -16,7 +16,7 @@ from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
 
-from load_data import load_participation, load_speech_agg, load_speech_summary, load_demographics, load_questions, load_topics
+from load_data import load_participation, load_speech_agg, load_demographics, load_questions, load_topics
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
