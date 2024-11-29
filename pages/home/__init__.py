@@ -47,8 +47,7 @@ sidebar_content = [
         [
             dbc.NavLink("Parleh-mate", href="/", active="exact"),
             dbc.NavLink("Participation", href="/participation", active="exact"),
-            dbc.NavLink("Speeches", href="/speeches", active="exact"), 
-            dbc.NavLink("Summaries", href="/summaries", active="exact"), 
+            dbc.NavLink("Speeches", href="/speeches", active="exact"),
             dbc.NavLink("Policy Positions", href="/policy_positions", active="exact"), 
             #dbc.NavLink("Bills", href="/bills", active="exact"),
             dbc.NavLink("Topics", href="/topics", active="exact"), 

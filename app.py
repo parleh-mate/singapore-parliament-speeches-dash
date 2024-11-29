@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.speeches import speeches_callbacks, speeches_layout
-from pages.summaries import summaries_callbacks, summaries_layout
 from pages.policy_positions import policy_positions_callbacks, policy_positions_layout
 from pages.topics import topics_callbacks, topics_layout
 from pages.participation import participation_callbacks, participation_layout
@@ -50,7 +49,6 @@ def get_data():
             'participation': load_participation(),
             'speech_agg': load_speech_agg(),
             'topics': load_topics(),
-            'speech_summaries': load_speech_summary(),
             'demographics': load_demographics(),
             'questions': load_questions()
         }
@@ -92,8 +90,6 @@ app.layout = html.Div([
                 
                 html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
 
-                html.Div(id='summaries-page', children=summaries_layout(), style={'display': 'none'}),
-
                 html.Div(id='policy-positions-page', children=policy_positions_layout(), style={'display': 'none'}),
 
                 html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
@@ -127,7 +123,6 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home-page', 'style'),
                 "participation": Output('participation-page', 'style'),
                 "speeches": Output('speeches-page', 'style'),
-                "summaries": Output('summaries-page', 'style'),
                 "policy_positions": Output('policy-positions-page', 'style'),
                 "topics": Output('topics-page', 'style'),
                 "questions": Output('questions-page', 'style'),
@@ -172,7 +167,6 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 participation_callbacks(app, data)
 speeches_callbacks(app, data)
-summaries_callbacks(app, data)
 policy_positions_callbacks(app, data)
 topics_callbacks(app, data)
 questions_callbacks(app, data)
