@@ -47,7 +47,7 @@ def policy_positions_layout():
                     dcc.Dropdown(
                         id='constituency-dropdown-rag',
                         options=[],  # Will be populated via callback
-                        placeholder='Select a Constituency',
+                        placeholder='Defaults to all',
                         searchable=True,
                         clearable=False
                     )
@@ -58,7 +58,7 @@ def policy_positions_layout():
                     dcc.Dropdown(
                         id='member-dropdown-rag',
                         options=[],  # Will be populated via callback
-                        placeholder='Select a Member Name',
+                        placeholder='Defaults to all',
                         searchable=True,
                         clearable=False
                     )
@@ -71,7 +71,7 @@ def policy_positions_layout():
                         dbc.Input(
                             id='text-input-rag',
                             type='text',
-                            placeholder='Enter your query here',
+                            placeholder='Enter your query here. For example "climate change"',
                         ),
                         dbc.Button(
                             "Submit",
@@ -80,7 +80,18 @@ def policy_positions_layout():
                             className='ms-2'
                         )
                     ])
-                ], md=8)
+                ], md=8),
+                dbc.Col([
+                    dbc.InputGroup([
+                        dbc.Button(
+                            "Reset Filters",
+                            id='reset-button-rag',
+                            color='secondary',
+                            className='ms-2',
+                            n_clicks=0
+                        )
+                    ])
+                ], md=3),
             ], className="mb-4"),
             
             # Accordion Section
@@ -146,11 +157,12 @@ def policy_positions_callbacks(app, data):
             Input('parliament-dropdown-rag', 'value'),
             Input('party-dropdown-rag', 'value'),
             Input('constituency-dropdown-rag', 'value'),
-            Input('member-dropdown-rag', 'value')
+            Input('member-dropdown-rag', 'value'),
+            Input('reset-button-rag', 'n_clicks')
         ],
         prevent_initial_call=True
     )
-    def update_constituency_and_member(selected_parliament, selected_party, selected_constituency, selected_member):
+    def update_constituency_and_member(selected_parliament, selected_party, selected_constituency, selected_member, reset_n_clicks):
         ctx = callback_context
 
         if not ctx.triggered:
@@ -174,7 +186,7 @@ def policy_positions_callbacks(app, data):
                 selection_options['party'] == selected_party
             ]
 
-        if trigger_id in ['parliament-dropdown-rag', 'party-dropdown-rag']:
+        if trigger_id in ['parliament-dropdown-rag', 'party-dropdown-rag', 'reset-button-rag']:
             # When Parliament or Party is changed
             # Update Constituency options based on Parliament and Party
             constituencies = sorted(selection_options['member_constituency'].unique())
@@ -255,8 +267,16 @@ def policy_positions_callbacks(app, data):
             raise PreventUpdate
 
         return constituency_options, new_selected_constituency, member_options, new_selected_member
-
-            
+    
+    @app.callback(
+        Output('text-input-rag', 'value'),
+        Input('reset-button-rag', 'n_clicks'),
+        prevent_initial_call=True
+    )
+    def reset_text_input(reset_n_clicks):
+        if reset_n_clicks:
+            return ''
+        raise PreventUpdate            
 
     # Callback to handle submit and display output paragraph
     @app.callback(
