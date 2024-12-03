@@ -6,7 +6,7 @@ import numpy as np
 from scipy.stats import gaussian_kde
 import math
 
-from load_data import load_gpt_prompts, load_speech_lengths
+from load_data import data
 
 df_topics = pd.read_csv("assets/topics_LDA.csv").sort_values("topic").drop(columns = "mean_word_weight")
 
@@ -37,7 +37,8 @@ topics_table = dash_table.DataTable(
 )
 
 # get speech length graph
-speech_lengths = load_speech_lengths().count_speeches_words
+speech_lengths = data['method-speech-lengths'].count_speeches_words
+
 
 # Calculate KDE with custom bandwidth
 kde = gaussian_kde(speech_lengths, bw_method=0.2)
@@ -160,7 +161,7 @@ fig.update_layout(
 fig.update_yaxes(showticklabels=False)
 
 # load gpt prompts
-gpt_df = load_gpt_prompts()
+gpt_df = data['method-gpt-prompts']
 
 # output summary description
 output_sum = gpt_df.output_summary_description[0].split('\n')
