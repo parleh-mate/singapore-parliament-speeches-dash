@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 
 from query_vectors import query_vector_embeddings, summarize_policy_positions
-from utils import parliaments, top_k_rag
+from utils import parliaments, try_again_message, top_k_rag
 
 # Filter out the 'All' parliament session
 parliaments = {i: v for i, v in parliaments.items() if i != 'All'}
@@ -305,15 +305,18 @@ def policy_positions_callbacks(app, data):
                 # Ensure output has at least one element
                 if output and len(output) > 0:
                     # Construct the returned text with Policy Position and Justification
-                    returned_text = html.P([
-                        html.H3("Policy Position"),
-                        output[0],
-                        html.Br(),
-                        html.Br(),
-                        html.H3('Proposed measures'),
-                        html.Ul([html.Li(i.replace('- ', '', 1)) for i in output[1].split('\n')])
-                        ]
-                        )
+                    if 'Your query did not return any relevant entries' in output[0]:
+                        returned_text = html.P(try_again_message)
+                    else:
+                        returned_text = html.P([
+                            html.H3("Policy Position"),
+                            output[0],
+                            html.Br(),
+                            html.Br(),
+                            html.H3('Proposed measures'),
+                            html.Ul([html.Li(i.replace('- ', '', 1)) for i in output[1].split('\n')])
+                            ]
+                            )
                     return returned_text
                 else:
                     return html.P("No summary available for the given input.")
@@ -322,3 +325,4 @@ def policy_positions_callbacks(app, data):
                 return html.P(f"An error occurred: {str(e)}")
         # Return empty string if submit button hasn't been clicked
         return ""
+
