@@ -257,14 +257,14 @@ def topics_questions_callbacks(app, data):
                 label="Percentage",
                 method="update",
                 args=[
-                    {"visible": [False]*num_traces + [True]*num_traces},
+                    {"visible": [True]*num_traces + [False]*num_traces},
                     {"title": "Speeches assigned to Topics",
                     "xaxis": {"title": "Percentage of Speeches",
                             "showgrid": True,
                             "gridwidth": 1,
                             "gridcolor": 'LightGray'},
                     "yaxis": {
-                            "title": "Ministry Addressed",
+                            "title": "Topic Assigned",
                             "categoryorder": "array",
                             "categoryarray": prop_order,
                             "tickfont": {"size": 10}
@@ -275,14 +275,14 @@ def topics_questions_callbacks(app, data):
                 label="Count",
                 method="update",
                 args=[
-                    {"visible": [True]*num_traces + [False]*num_traces},
+                    {"visible": [False]*num_traces + [True]*num_traces},
                     {"title": "Speeches assigned to Topics",
                     "xaxis": {"title": "Speeches",
                             "showgrid": True,
                             "gridwidth": 1,
                             "gridcolor": 'LightGray'},
                     "yaxis": {
-                            "title": "Ministry Addressed",
+                            "title": "Topic Assigned",
                             "categoryorder": "array",
                             "categoryarray": count_order,
                             "tickfont": {"size": 10}
@@ -317,7 +317,7 @@ def topics_questions_callbacks(app, data):
                 text="Speeches assigned to Topics",
             ),
             xaxis_title="Speeches",
-            yaxis_title="Ministry Addressed",
+            yaxis_title="Topic Assigned",
             template='plotly_white'
         )
 
@@ -392,7 +392,7 @@ def topics_questions_callbacks(app, data):
                 label="Percentage",
                 method="update",
                 args=[
-                    {"visible": [False]*num_traces + [True]*num_traces},
+                    {"visible": [True]*num_traces + [False]*num_traces},
                     {"title": "Questions addressed to Ministries",
                     "xaxis": {"title": "Percentage of Questions",
                             "showgrid": True,
@@ -410,7 +410,7 @@ def topics_questions_callbacks(app, data):
                 label="Count",
                 method="update",
                 args=[
-                    {"visible": [True]*num_traces + [False]*num_traces},
+                    {"visible": [False]*num_traces + [True]*num_traces},
                     {"title": "Questions addressed to Ministries",
                     "xaxis": {"title": "Questions",
                             "showgrid": True,
