@@ -100,7 +100,7 @@ def member_metrics_layout():
                     html.Label("Select an x-axis variable:"),
                     dcc.Dropdown(
                         id='member-metrics-xaxis-dropdown',
-                        options=[{'label': key, 'value': value} for key, value in member_metrics_options.items()],
+                        options=[{'label': 'none', 'value': 'none'}] + [{'label': key, 'value': value} for key, value in member_metrics_options.items()],
                         value='speeches_per_sitting',
                         searchable=False,
                         clearable=False
@@ -223,15 +223,15 @@ def member_metrics_callbacks(app, data):
             ]
     )
     def update_size_dropdown(x_axis, y_axis):
-    # Start with the 'none' option
-        options = [{'label': 'none', 'value': "none"}]
-        
-        # Iterate through member_metrics_options and exclude selected x and y values
-        for key, value in member_metrics_options.items():
-            if value not in [x_axis, y_axis]:
-                options.append({'label': key, 'value': value})
-        
-        return options, options[1]['value']
+        # Start with the 'none' option
+            options = [{'label': 'none', 'value': "none"}]
+            
+            # Iterate through member_metrics_options and exclude selected x and y values
+            for key, value in member_metrics_options.items():
+                if value not in [x_axis, y_axis]:
+                    options.append({'label': key, 'value': value})
+            
+            return options, ("none" if x_axis=="none" else options[1]['value'])
 
     # Callback to update the member_metrics graph and table on Page 1
     @app.callback(
