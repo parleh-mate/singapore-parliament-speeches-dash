@@ -1,6 +1,7 @@
 from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
+import numpy as np
 
 from utils import PARTY_COLOURS, parliaments, parliament_sessions, member_metrics_options, SIZE_MIN, SIZE_MAX
 
@@ -115,7 +116,7 @@ def member_metrics_layout():
                         searchable=False,
                         clearable=False
                     )
-                ], md=4),
+                ], md=4, id='member-metrics-size-dropdown-container', style={'display': 'block'}),
             ], className = "mb-4"),
             
             # Accordion Section
@@ -211,6 +212,16 @@ def member_metrics_callbacks(app, data):
         # Add 'All' option
         options = [{'label': 'All', 'value': 'All'}] + [{'label': member, 'value': member} for member in members]
         return options, 'All'
+    # Callback to control visibility of the size dropdown
+    @app.callback(
+        Output('member-metrics-size-dropdown-container', 'style'),
+        Input('member-metrics-xaxis-dropdown', 'value')
+    )
+    def toggle_size_dropdown(x_axis):
+        if x_axis=='none':
+            return {'display': 'none'}
+        else:
+            return {'display': 'block'}
     
     @app.callback(
             [
@@ -231,7 +242,7 @@ def member_metrics_callbacks(app, data):
                 if value not in [x_axis, y_axis]:
                     options.append({'label': key, 'value': value})
             
-            return options, ("none" if x_axis=="none" else options[1]['value'])
+            return options, options[1]['value']
 
     # Callback to update the member_metrics graph and table on Page 1
     @app.callback(
@@ -248,13 +259,17 @@ def member_metrics_callbacks(app, data):
     def update_graph_and_table(selected_parliament, selected_constituency, selected_member, xaxis_var, yaxis_var, size_var):
 
         # set names of variables
-        xaxis_varname = xaxis_var.replace('_', ' ').title()
         yaxis_varname = yaxis_var.replace('_', ' ').title()
 
         if size_var=="none":
             size_var = None
         else:
             size_varname = size_var.replace('_', ' ').title()
+
+        if xaxis_var=="none":
+            xaxis_var = None
+        else:
+            xaxis_varname = xaxis_var.replace('_', ' ').title()
 
         # filter out vars for which None was chosen
         selected_vars = [i for i in [xaxis_var, yaxis_var, size_var] if i]
@@ -283,9 +298,9 @@ def member_metrics_callbacks(app, data):
             )
 
         # Filter by parliament        
-        member_metrics_df_highlighted = member_metrics_df[member_metrics_df['parliament'] == parliaments[selected_parliament]]
+        full_df = member_metrics_df[member_metrics_df['parliament'] == parliaments[selected_parliament]]
 
-        full_df = member_metrics_df_highlighted.copy()
+        member_metrics_df_highlighted = full_df.copy()
       
         # Further filter based on selected_constituency
         if selected_constituency != 'All' and selected_constituency:
@@ -295,64 +310,175 @@ def member_metrics_callbacks(app, data):
         if selected_member != 'All' and selected_member:
             member_metrics_df_highlighted = member_metrics_df_highlighted[member_metrics_df_highlighted['member_name'] == selected_member]
 
-        member_metrics_df_non_highlighted = full_df.drop(member_metrics_df_highlighted.index)        
+        member_metrics_df_non_highlighted = full_df.drop(member_metrics_df_highlighted.index)
+
+        # now create boxplot if xaxis is none, else create scatterplot
+        if not xaxis_var:
+            # start with boxplot + scatterplot
+            unique_parties = sorted(full_df['member_party'].unique())
+            party_to_num = {party: idx for idx, party in enumerate(unique_parties)}
+
+            fig = go.Figure()
+
+            # plot boxplot across all datapoints for each party
+
+            for party in unique_parties:
+                plot_df = full_df[full_df['member_party'] == party]
+                fig.add_trace(
+                    go.Box(
+                        x=plot_df['member_party'].map(party_to_num),  # Set numerical x position
+                        y=plot_df[yaxis_var],
+                        name='', 
+                        marker_color=PARTY_COLOURS[party],  
+                        boxpoints=False, 
+                        line=dict(color=PARTY_COLOURS[party]),
+                        showlegend=False 
+                    )
+                )
+
+            # now add points for non highlighted points; scatter preferred to strip because of customizability
+
+            for party in member_metrics_df_non_highlighted['member_party'].unique():
+                # Filter data for the current non-highlighted party
+                plot_df = member_metrics_df_non_highlighted[member_metrics_df_non_highlighted['member_party'] == party]
+                
+                # Numerical position for the current party
+                party_num = party_to_num[party]
+                
+                # Add Scatter Trace for Individual Points of the Non-Highlighted Party (Grey Points) with Jitter
+                jitter = np.random.uniform(-0.1, 0.1, size=len(plot_df)) 
+                scatter_x = [party_num + j for j in jitter]
+                
+                fig.add_trace(
+                    go.Scatter(
+                        x=scatter_x,  # Apply jitter to numerical x positions
+                        y=plot_df[yaxis_var],
+                        mode='markers',
+                        marker=dict(
+                            color='grey',        # Grey color for non-highlighted points
+                            opacity=0.2
+                        ),
+                        hoverinfo='skip',      # Disable hover
+                        name='',                
+                        showlegend=False 
+                    )
+                )
+
+            # add highlighted points last
+
+            for party in member_metrics_df_highlighted['member_party'].unique():
+                # Filter data for the current highlighted party
+                plot_df = member_metrics_df_highlighted[member_metrics_df_highlighted['member_party'] == party]
+                
+                # Numerical position for the current party
+                party_num = party_to_num[party]
+                
+                # Add Scatter Trace for Individual Points of the Highlighted Party with Jitter
+                jitter = np.random.uniform(-0.1, 0.1, size=len(plot_df))  # Adjust jitter range as needed
+                scatter_x = [party_num + j for j in jitter]
+                
+                fig.add_trace(
+                    go.Scatter(
+                        x=scatter_x,  # Apply jitter to numerical x positions
+                        y=plot_df[yaxis_var],
+                        mode='markers',
+                        marker=dict(
+                            color=plot_df['member_party'].map(PARTY_COLOURS),
+                            opacity=0.6
+                        ),
+                        hovertext=(
+                            "Member: " + plot_df['member_name'] + "<br>" +
+                            "Party: " + plot_df['member_party'] + "<br>" +
+                            "Questions: " + plot_df[yaxis_var].astype(str)
+                        ),
+                        hoverinfo='text',
+                        customdata=plot_df[['member_name']],  # Pass member names for hover
+                        name=party, 
+                        showlegend=True 
+                    )
+                )
+
+
+            # customize layout
+
+            fig.update_layout(
+                height=600,
+                legend=dict(title=dict(text='Party'),
+                            yanchor="top",
+                            orientation='h',
+                            y=1.1,
+                            xanchor="right",
+                            x=0.99),
+                margin=dict(l=0, r=0),
+                title=f'{yaxis_varname} by Party',
+                xaxis_title='Party',
+                yaxis_title=yaxis_varname,
+                template='plotly_white',
+                boxmode='overlay',  # Overlay boxes; consistent with your adjustment
+                xaxis=dict(
+                    tickmode='array',
+                    tickvals=list(party_to_num.values()),  # Numerical positions
+                    ticktext=list(party_to_num.keys())    # Party names as labels
+                )
+            )
         
-        # Create the scatter plot
-        fig = go.Figure()
+        else:
+            # Create the scatter plot
+            fig = go.Figure()
 
-        # add traces for highlighted points
-        for party in member_metrics_df_highlighted.member_party.unique():
+            # add traces for highlighted points
+            for party in member_metrics_df_highlighted.member_party.unique():
 
-            plot_df = member_metrics_df_highlighted.query(f"member_party=='{party}'")
+                plot_df = member_metrics_df_highlighted.query(f"member_party=='{party}'")
 
+                fig.add_trace(go.Scatter(
+                    x=plot_df[xaxis_var],
+                    y=plot_df[yaxis_var],
+                    mode='markers',
+                    marker={
+                        'color': plot_df['member_party'].map(PARTY_COLOURS),
+                        'opacity': 0.6,
+                        **({'size': plot_df['marker_size']} if size_var else {})},
+                    hovertext=("Member: " + plot_df['member_name'] + "<br>" +
+                                "Party: " + plot_df['member_party'] + "<br>" +
+                                f"{xaxis_varname}: " + plot_df[xaxis_var].astype(str) + "<br>" +
+                                f"{yaxis_varname}: " + plot_df[yaxis_var].astype(str) + "<br>" +
+                                (f"{size_varname}: " + plot_df[size_var].astype(str) if size_var else '')
+                    ),
+                    hoverinfo='text',
+                    name=party,
+                    showlegend=True  # Only the highlighted trace shows in legend
+                ))
+
+            # now add traces for non highlighted points    
             fig.add_trace(go.Scatter(
-                x=plot_df[xaxis_var],
-                y=plot_df[yaxis_var],
+                x=member_metrics_df_non_highlighted[xaxis_var],
+                y=member_metrics_df_non_highlighted[yaxis_var],
                 mode='markers',
                 marker={
-                    'color': plot_df['member_party'].map(PARTY_COLOURS),
-                    'opacity': 0.6,
-                    **({'size': plot_df['marker_size']} if size_var else {})},
-                hovertext=("Member: " + plot_df['member_name'] + "<br>" +
-                            "Party: " + plot_df['member_party'] + "<br>" +
-                            f"{xaxis_varname}: " + plot_df[xaxis_var].astype(str) + "<br>" +
-                            f"{yaxis_varname}: " + plot_df[yaxis_var].astype(str) + "<br>" +
-                            (f"{size_varname}: " + plot_df[size_var].astype(str) if size_var else '')
-                ),
-                hoverinfo='text',
-                name=party,
-                showlegend=True  # Only the highlighted trace shows in legend
+                    'color': 'grey',
+                    'opacity': 0.2,
+                    **({'size': member_metrics_df_non_highlighted['marker_size']} if size_var else {})
+                },
+                hoverinfo='skip',  # Disable hover for non-highlighted points
+                showlegend=False  # Non-highlighted trace doesn't show in legend
             ))
 
-        # now add traces for non highlighted points    
-        fig.add_trace(go.Scatter(
-            x=member_metrics_df_non_highlighted[xaxis_var],
-            y=member_metrics_df_non_highlighted[yaxis_var],
-            mode='markers',
-            marker={
-                'color': 'grey',
-                'opacity': 0.2,
-                **({'size': member_metrics_df_non_highlighted['marker_size']} if size_var else {})
-            },
-            hoverinfo='skip',  # Disable hover for non-highlighted points
-            showlegend=False  # Non-highlighted trace doesn't show in legend
-        ))
+            # now update layout format
 
-        # now update layout format
-
-        fig.update_layout(
-            title=(f"{yaxis_varname} vs. {xaxis_varname} - Parliament {selected_parliament}" + (f"<br><span style='font-size:12px; color:grey'>Point size corresponds to {size_var.replace('_', ' ').title()}</span>" if size_var else '')),
-            xaxis_title=xaxis_varname,
-            yaxis_title=yaxis_varname,
-            legend=dict(
-                title=dict(text='Party'),
-                yanchor="top",
-                y=1.1,
-                xanchor="right",
-                x=0.99,
-                orientation='h'
-            ),
-            template='plotly_white'
-        )
+            fig.update_layout(
+                title=(f"{yaxis_varname} vs. {xaxis_varname} - Parliament {selected_parliament}" + (f"<br><span style='font-size:12px; color:grey'>Point size corresponds to {size_var.replace('_', ' ').title()}</span>" if size_var else '')),
+                xaxis_title=xaxis_varname,
+                yaxis_title=yaxis_varname,
+                legend=dict(
+                    title=dict(text='Party'),
+                    yanchor="top",
+                    y=1.1,
+                    xanchor="right",
+                    x=0.99,
+                    orientation='h'
+                ),
+                template='plotly_white'
+            )
         
         return fig
