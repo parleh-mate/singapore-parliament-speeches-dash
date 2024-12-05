@@ -138,7 +138,7 @@ def policy_positions_callbacks(app, data):
     def update_party_options(selected_parliament):
         selection_options = data['demographics']
         if selected_parliament:
-            parties = selection_options['party'][selection_options['parliament']==int(parliaments[selected_parliament])]
+            parties = selection_options['member_party'][selection_options['parliament']==int(parliaments[selected_parliament])]
 
             parties = sorted(parties.unique())
             return parties, parties[0]
@@ -183,7 +183,7 @@ def policy_positions_callbacks(app, data):
         # Filter by party
         if selected_party:
             selection_options = selection_options[
-                selection_options['party'] == selected_party
+                selection_options['member_party'] == selected_party
             ]
 
         if trigger_id in ['parliament-dropdown-rag', 'party-dropdown-rag', 'reset-button-rag']:

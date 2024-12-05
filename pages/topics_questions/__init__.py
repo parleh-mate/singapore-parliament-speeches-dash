@@ -193,14 +193,14 @@ def topics_questions_callbacks(app, data):
         topics_df = filter_data_by_filters(data, 'topics', selected_parliament, selected_constituency, selected_member)
 
         # grouping and aggregation here instead of SQL to retain member name information for filtering first        
-        topics_df = group_and_aggregate(topics_df, 'topic_assigned', 'count_speeches', 'perc_speeches')
-        questions_ministry_df = group_and_aggregate(questions_ministry_df, 'ministry_addressed', 'count_questions', 'perc_questions')
+        topics_df = group_and_aggregate(topics_df, 'topic_assigned', 'count_topic_speeches', 'perc_speeches')
+        questions_ministry_df = group_and_aggregate(questions_ministry_df, 'ministry_addressed', 'count_questions_ministry', 'perc_questions')
 
         # speech topics graph
         # create orders manually
 
         orders = []
-        for i in ['perc_speeches', 'count_speeches']:
+        for i in ['perc_speeches', 'count_topic_speeches']:
             orders.append(topics_df.groupby('topic_assigned').sum().sort_values(i).index)
 
         prop_order, count_order = orders
@@ -224,7 +224,7 @@ def topics_questions_callbacks(app, data):
 
         fig_topics_count = px.bar(
             topics_df,
-            x='count_speeches',
+            x='count_topic_speeches',
             y='topic_assigned',
             color='member_party',
             barmode='relative',
@@ -335,7 +335,7 @@ def topics_questions_callbacks(app, data):
         # create orders manually
 
         orders = []
-        for i in ['perc_questions', 'count_questions']:
+        for i in ['perc_questions', 'count_questions_ministry']:
             orders.append(questions_ministry_df.groupby('ministry_addressed').sum().sort_values(i).index)
 
         prop_order, count_order = orders
@@ -359,7 +359,7 @@ def topics_questions_callbacks(app, data):
 
         fig_questions_count = px.bar(
             questions_ministry_df,
-            x='count_questions',
+            x='count_questions_ministry',
             y='ministry_addressed',
             color='member_party',
             barmode='relative',
