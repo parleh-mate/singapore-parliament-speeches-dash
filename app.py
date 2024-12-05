@@ -5,10 +5,8 @@ import dash
 from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.member_metrics import member_metrics_callbacks, member_metrics_layout
-from pages.speeches import speeches_callbacks, speeches_layout
 from pages.policy_positions import policy_positions_callbacks, policy_positions_layout
 from pages.topics import topics_callbacks, topics_layout
-from pages.participation import participation_callbacks, participation_layout
 from pages.questions import questions_callbacks, questions_layout
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
@@ -42,14 +40,10 @@ app.layout = html.Div([
                 html.Div(id='home-page', children=home_page, style={'display': 'block'}),
 
                 html.Div(id='member-metrics-page', children=member_metrics_layout(), style={'display': 'none'}),
-                
-                html.Div(id='speeches-page', children=speeches_layout(), style={'display': 'none'}),
 
                 html.Div(id='policy-positions-page', children=policy_positions_layout(), style={'display': 'none'}),
 
                 html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
-                
-                html.Div(id='participation-page', children=participation_layout(), style={'display': 'none'}),
 
                 html.Div(id='questions-page', children=questions_layout(), style={'display': 'none'}),
 
@@ -77,8 +71,6 @@ app.layout = html.Div([
 # generate page outputs, make it easier to toggle display later on
 page_outputs = {"home": Output('home-page', 'style'),
                 "member_metrics": Output('member-metrics-page', 'style'),
-                "participation": Output('participation-page', 'style'),
-                "speeches": Output('speeches-page', 'style'),
                 "policy_positions": Output('policy-positions-page', 'style'),
                 "topics": Output('topics-page', 'style'),
                 "questions": Output('questions-page', 'style'),
@@ -122,8 +114,6 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 # Register callbacks; must be in correct order!
 
 member_metrics_callbacks(app, data)
-participation_callbacks(app, data)
-speeches_callbacks(app, data)
 policy_positions_callbacks(app, data)
 topics_callbacks(app, data)
 questions_callbacks(app, data)
