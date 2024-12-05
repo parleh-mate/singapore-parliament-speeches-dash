@@ -6,7 +6,6 @@ from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
 from pages.member_metrics import member_metrics_callbacks, member_metrics_layout
 from pages.policy_positions import policy_positions_callbacks, policy_positions_layout
-from pages.topics import topics_callbacks, topics_layout
 from pages.topics_questions import topics_questions_callbacks, topics_questions_layout
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
@@ -43,8 +42,6 @@ app.layout = html.Div([
 
                 html.Div(id='policy-positions-page', children=policy_positions_layout(), style={'display': 'none'}),
 
-                html.Div(id='topics-page', children=topics_layout(), style={'display': 'none'}),
-
                 html.Div(id='topics-questions-page', children=topics_questions_layout(), style={'display': 'none'}),
 
                 html.Div(id='demographics-page', children=demographics_layout(), style={'display': 'none'}),
@@ -72,7 +69,6 @@ app.layout = html.Div([
 page_outputs = {"home": Output('home-page', 'style'),
                 "member_metrics": Output('member-metrics-page', 'style'),
                 "policy_positions": Output('policy-positions-page', 'style'),
-                "topics": Output('topics-page', 'style'),
                 "topics_questions": Output('topics-questions-page', 'style'),
                 "demographics": Output('demographics-page', 'style'),
                 "methodology": Output('methodology-page', 'style'),
@@ -115,7 +111,6 @@ def toggle_offcanvas(n_clicks, pathname, is_open):
 
 member_metrics_callbacks(app, data)
 policy_positions_callbacks(app, data)
-topics_callbacks(app, data)
 topics_questions_callbacks(app, data)
 demographics_callbacks(app, data)
 
