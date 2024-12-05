@@ -16,6 +16,10 @@ ETHNIC_COLOURS = {
     "others": "#FBCEB1",  # pastel orange
 }
 
+# member metrics scatterplot min and max size parameters in pixels
+SIZE_MIN = 5
+SIZE_MAX = 40
+
 # Define parliaments
 parliaments = {
     "12th (2011-2015)": '12',
@@ -31,6 +35,16 @@ parliament_parties = {
 }
 
 parliament_sessions = sorted(parliaments.keys(), reverse=True)
+
+# member metrics options
+member_metrics_options = {
+    'speeches per sitting': 'speeches_per_sitting',
+    'words per speech': 'words_per_speech',
+    'readability score': 'readability_score',
+    'attendance': 'attendance',
+    'participation': 'participation',
+    'questions per sitting': 'questions_per_sitting'
+}
 
 # query embedding model
 embedding_model = "text-embedding-3-small"
