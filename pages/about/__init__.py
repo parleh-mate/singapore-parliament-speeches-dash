@@ -15,7 +15,7 @@ def about_layout():
                             "The project is wholly maintained by a group of volunteers - this involves investing not just time but also our own funds to create and maintain cloud resources. If you find this resource useful, consider ",
                             html.A(
                                 "buying us a coffee",
-                                href="https://buymeacoffee.com/", 
+                                href="https://buymeacoffee.com/parlehmate", 
                                 target="_blank",  # Opens the link in a new tab
                                 style={'color': '#007bff', 'textDecoration': 'underline'}
                             ),
