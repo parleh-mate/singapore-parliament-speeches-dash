@@ -81,6 +81,6 @@ def get_response_format(query, uoa):
 
 # top k for RAG
 
-top_k_rag = 5
+top_k_rag = 10
 
 rag_index = "singapore-speeches-positions"
