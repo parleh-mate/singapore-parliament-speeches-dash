@@ -33,7 +33,7 @@ def demographics_layout():
                     ),
                 ], md=4),
             ], className="mb-4"),
-                        dbc.Accordion(
+            dbc.Accordion(
                 [
                     dbc.AccordionItem(
                         [
