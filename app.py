@@ -113,7 +113,3 @@ member_metrics_callbacks(app, data)
 policy_positions_callbacks(app, data)
 topics_questions_callbacks(app, data)
 demographics_callbacks(app, data)
-
-# Run the app
-if __name__ == "__main__":
-    app.run_server(debug=True)
