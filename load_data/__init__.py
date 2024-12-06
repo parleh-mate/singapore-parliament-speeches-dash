@@ -2,7 +2,18 @@ from google.cloud import storage
 import pickle
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp_token.json"
+credentials_json = os.environ.get('GCP_JSON')
+
+if not credentials_json:
+    raise EnvironmentError("The GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.")
+
+credentials_path = '/tmp/gcp_token.json'  # Ensure this path is writable
+
+# Step 3: Write the JSON content to the file
+with open(credentials_path, 'w') as f:
+    f.write(credentials_json)
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
 
 # Initialize the GCS client
 storage_client = storage.Client()
