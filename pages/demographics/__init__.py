@@ -103,7 +103,7 @@ def demographics_callbacks(app, data):
         age_histogram = px.histogram(
             demographics_hist_df,
             x='year_age_entered',
-            color='party', 
+            color='member_party', 
             opacity=0.75,
             histnorm='percent',
             color_discrete_map=PARTY_COLOURS,
@@ -134,7 +134,7 @@ def demographics_callbacks(app, data):
         age_density = go.Figure()
 
         # Loop through each party and calculate KDE
-        unique_parties = list(demographics_df['party'].unique())
+        unique_parties = list(demographics_df['member_party'].unique())
         unique_parties.append("All")
         
         for party in unique_parties:
@@ -142,7 +142,7 @@ def demographics_callbacks(app, data):
             if party=="All":
                 party_data = demographics_df['year_age_entered']
             else:
-                party_data = demographics_df[demographics_df['party'] == party]['year_age_entered']
+                party_data = demographics_df[demographics_df['member_party'] == party]['year_age_entered']
                 
             buffer = 15
 
@@ -299,20 +299,20 @@ def demographics_callbacks(app, data):
 
         # ethnicity and gender graph
 
-        ethnicity_parties = demographics_df.groupby(['party', 'member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
+        ethnicity_parties = demographics_df.groupby(['member_party', 'member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
 
-        all_parties = list(ethnicity_parties.party.unique())
+        all_parties = list(ethnicity_parties.member_party.unique())
         all_parties.sort(reverse=True)
         all_parties.append('All')
 
         # get for all parties
         ethnicity_all = demographics_df.groupby(['member_ethnicity', 'gender'])['member_name'].count().reset_index().rename(columns = {"member_name": "count"})
 
-        ethnicity_all['party'] = 'All'
+        ethnicity_all['member_party'] = 'All'
 
         ethnicity_df = pd.concat([ethnicity_parties, ethnicity_all])
 
-        ethnicity_df['percentage'] = ethnicity_df['count']*100 / ethnicity_df.groupby('party')['count'].transform('sum')
+        ethnicity_df['percentage'] = ethnicity_df['count']*100 / ethnicity_df.groupby('member_party')['count'].transform('sum')
 
         ethnicity_df['member_ethnicity'] = pd.Categorical(ethnicity_df['member_ethnicity'], categories=['chinese', 'malay', 'indian', 'others'], ordered=True)
 
@@ -321,7 +321,7 @@ def demographics_callbacks(app, data):
         ethnicity_fig = px.bar(
             ethnicity_df, 
             x="percentage", 
-            y="party", 
+            y="member_party", 
             custom_data=["member_ethnicity", "gender", "count"],
             color="member_ethnicity",
             pattern_shape="gender",

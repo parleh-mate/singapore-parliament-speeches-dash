@@ -193,14 +193,14 @@ def topics_questions_callbacks(app, data):
         topics_df = filter_data_by_filters(data, 'topics', selected_parliament, selected_constituency, selected_member)
 
         # grouping and aggregation here instead of SQL to retain member name information for filtering first        
-        topics_df = group_and_aggregate(topics_df, 'topic_assigned', 'count_speeches', 'perc_speeches')
-        questions_ministry_df = group_and_aggregate(questions_ministry_df, 'ministry_addressed', 'count_questions', 'perc_questions')
+        topics_df = group_and_aggregate(topics_df, 'topic_assigned', 'count_topic_speeches', 'perc_speeches')
+        questions_ministry_df = group_and_aggregate(questions_ministry_df, 'ministry_addressed', 'count_questions_ministry', 'perc_questions')
 
         # speech topics graph
         # create orders manually
 
         orders = []
-        for i in ['perc_speeches', 'count_speeches']:
+        for i in ['perc_speeches', 'count_topic_speeches']:
             orders.append(topics_df.groupby('topic_assigned').sum().sort_values(i).index)
 
         prop_order, count_order = orders
@@ -224,7 +224,7 @@ def topics_questions_callbacks(app, data):
 
         fig_topics_count = px.bar(
             topics_df,
-            x='count_speeches',
+            x='count_topic_speeches',
             y='topic_assigned',
             color='member_party',
             barmode='relative',
@@ -257,14 +257,14 @@ def topics_questions_callbacks(app, data):
                 label="Percentage",
                 method="update",
                 args=[
-                    {"visible": [False]*num_traces + [True]*num_traces},
+                    {"visible": [True]*num_traces + [False]*num_traces},
                     {"title": "Speeches assigned to Topics",
                     "xaxis": {"title": "Percentage of Speeches",
                             "showgrid": True,
                             "gridwidth": 1,
                             "gridcolor": 'LightGray'},
                     "yaxis": {
-                            "title": "Ministry Addressed",
+                            "title": "Topic Assigned",
                             "categoryorder": "array",
                             "categoryarray": prop_order,
                             "tickfont": {"size": 10}
@@ -275,14 +275,14 @@ def topics_questions_callbacks(app, data):
                 label="Count",
                 method="update",
                 args=[
-                    {"visible": [True]*num_traces + [False]*num_traces},
+                    {"visible": [False]*num_traces + [True]*num_traces},
                     {"title": "Speeches assigned to Topics",
                     "xaxis": {"title": "Speeches",
                             "showgrid": True,
                             "gridwidth": 1,
                             "gridcolor": 'LightGray'},
                     "yaxis": {
-                            "title": "Ministry Addressed",
+                            "title": "Topic Assigned",
                             "categoryorder": "array",
                             "categoryarray": count_order,
                             "tickfont": {"size": 10}
@@ -317,7 +317,7 @@ def topics_questions_callbacks(app, data):
                 text="Speeches assigned to Topics",
             ),
             xaxis_title="Speeches",
-            yaxis_title="Ministry Addressed",
+            yaxis_title="Topic Assigned",
             template='plotly_white'
         )
 
@@ -335,7 +335,7 @@ def topics_questions_callbacks(app, data):
         # create orders manually
 
         orders = []
-        for i in ['perc_questions', 'count_questions']:
+        for i in ['perc_questions', 'count_questions_ministry']:
             orders.append(questions_ministry_df.groupby('ministry_addressed').sum().sort_values(i).index)
 
         prop_order, count_order = orders
@@ -359,7 +359,7 @@ def topics_questions_callbacks(app, data):
 
         fig_questions_count = px.bar(
             questions_ministry_df,
-            x='count_questions',
+            x='count_questions_ministry',
             y='ministry_addressed',
             color='member_party',
             barmode='relative',
@@ -392,7 +392,7 @@ def topics_questions_callbacks(app, data):
                 label="Percentage",
                 method="update",
                 args=[
-                    {"visible": [False]*num_traces + [True]*num_traces},
+                    {"visible": [True]*num_traces + [False]*num_traces},
                     {"title": "Questions addressed to Ministries",
                     "xaxis": {"title": "Percentage of Questions",
                             "showgrid": True,
@@ -410,7 +410,7 @@ def topics_questions_callbacks(app, data):
                 label="Count",
                 method="update",
                 args=[
-                    {"visible": [True]*num_traces + [False]*num_traces},
+                    {"visible": [False]*num_traces + [True]*num_traces},
                     {"title": "Questions addressed to Ministries",
                     "xaxis": {"title": "Questions",
                             "showgrid": True,

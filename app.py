@@ -1,6 +1,7 @@
 from dash import html, dcc, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 import dash
+import os
 
 from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
@@ -115,5 +116,5 @@ topics_questions_callbacks(app, data)
 demographics_callbacks(app, data)
 
 # Run the app
-if __name__ == "__main__":
+if __name__ == "__main__" and os.environ.get('ENVIRONMENT') == 'development':
     app.run_server(debug=True)

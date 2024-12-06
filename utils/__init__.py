@@ -51,6 +51,8 @@ embedding_model = "text-embedding-3-small"
 
 # get prompts for GPT summary
 
+try_again_message = 'Your query did not return any relevant entries, please try again with something else or perhaps something less specific.'
+
 system_prompt = "You are a non-partisan political analyst who will take policy positions summarized from speeches (in bullet points) made by politician(s) in the Singapore parliament on a given topic and by a given party, and then output an overall summary of the party or politican's political position on the issue and policy points that support your view."
 
 def get_response_format(query, uoa):
@@ -61,7 +63,7 @@ def get_response_format(query, uoa):
 
     2. Gather all policy positions that are deemed relevant to the query and summarize these into a coherent policy approach by the party or politician on the issue.
 
-    3. In the case of esoteric queries, it may be the case that no policy positions retrieved are relevant. In this case, do not hallucinate non-existent policy positions. Instead, return an output saying 'Your query did not return any relevant entries, please try again with something else or perhaps something less specific.'
+    3. In the case of esoteric queries, it may be the case that no policy positions retrieved are relevant. In this case, do not hallucinate non-existent policy positions. Instead, return an output saying '{try_again_message}'
 
     Writing style: Begin your summary with 'The [insert unit of analysis]'s position on...'. The unit of analysis can either be the Party, Constituency, or MP. In this case the unit of analysis is the {uoa}. Use the third-person like 'the Party', 'the Constituency', or 'the MP' when referring to them rather than their actual names. Write in concise manner, avoiding tautology.
     """
@@ -79,6 +81,6 @@ def get_response_format(query, uoa):
 
 # top k for RAG
 
-top_k_rag = 5
+top_k_rag = 10
 
 rag_index = "singapore-speeches-positions"

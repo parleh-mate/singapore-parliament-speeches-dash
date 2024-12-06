@@ -1,14 +1,16 @@
-import os
 from pinecone import Pinecone
 from openai import OpenAI
+import os
 
 from utils import embedding_model, get_response_format, system_prompt, rag_index
 
-# pinecone api key
-os.environ['PINECONE_API_KEY'] = open("tokens/pinecone_token.txt", 'r').readlines()[0]
+# load api keys if in development
 
-# gpt key
-os.environ["OPENAI_API_KEY"] = open("tokens/gpt_api_token.txt", 'r').readlines()[0]
+if os.environ.get('ENVIRONMENT') == 'development':
+    # pinecone api key
+    os.environ['PINECONE_API_KEY'] = open("tokens/pinecone_token.txt", 'r').readlines()[0]
+    # gpt key
+    os.environ["OPENAI_API_KEY"] = open("tokens/gpt_api_token.txt", 'r').readlines()[0]
 
 # pinecone client
 pc = Pinecone()
