@@ -214,7 +214,7 @@ def methodology_layout():
     
                         html.H2("Data Sourcing", id="datasourcing-method"),
                         html.P([
-                            "All data comes courtesy of the Singapore Parliament Hansards API. A request is made to the API at 00:00 SGT every day to check for new speeches, which are usually added to the Hansards ~2 weeks after a sitting. Data is then cleaned and stored on BigQuery. Information on the data lineage can be found on the ",
+                            "All data comes courtesy of the Singapore Parliament Hansards API. A request is made to the API at 00:00 SGT every day to check for new speeches, which are usually added to the Hansards ~2 weeks after a sitting. Data is then transformed and stored on BigQuery. Information on the data lineage can be found on the ",
                             html.A(
                                 "DBT documentation page",
                                 href="https://cloud.getdbt.com/accounts/237272/jobs/506988/docs/#!/overview",  # Replace with actual URL
@@ -269,20 +269,10 @@ def methodology_layout():
                         ),                  
                         html.H2("Topics", id="topics-method"),
                         html.P([
-                            "Topics are labelled by GPT and are done at the same time as speech summarization. Our approach to topic labelling is semi-principled and involves a combination of unsupervised topic modelling and human interpretation to identify a set list of topics which we then pass to GPT. We first use a Latent Dirichlet Allocation (LDA) model to group words into 25 topics. We then use our own subjective judgement to label each topic based on the top 15 most important words in each topic, and then decide if a topic is relevant enough to be included in the final list. We end up with a list of 17 topics.",
+                            "Topics are labelled by GPT and are done at the same time as speech summarization. Our approach is semi-principled and involves a combination of unsupervised topic modelling and human interpretation to identify a set list of topics which we then pass to GPT. We first use a Latent Dirichlet Allocation (LDA) model to group words into 25 topics. We then use our own subjective judgement to label each topic based on the top 15 most important words in each topic, and then decide if a topic is relevant enough to be included in the final list. We end up with a list of 17 topics.",
                             html.Br(),
                             html.Br(),
-                            "As can be observed from the table below, some topics like 23 and 24 contain words that do not belong to a coherent topic and are excluded. Topics like 2 (Religion) and 7 (Animal Welfare) were also excluded due to the likely rarity of these topics in parliament, though perhaps an argument can be made for Religion. Some topics like 18 were further split into sub-topics ('Military Defense and National Security' and 'Foreign Policy') based on our interpretation of the top words. Finally, topics 3, 4, and 19 were grouped under a single header of 'Urban Planning', again to minimize esoteric topics.",
-                            html.Br(),
-                            html.Br(), 
-                            "LDA models are probabilistic in nature and do not account for semantic meaning between words in a sentence. This is a major flaw and partly why so much human interpretation is required, despite multiple attempts at fine tuning. As a next step we are looking to test the use of sentence transformers to better account for semantic meaning. The full script for the LDA model can be found ",
-                            html.A(
-                                "here",
-                                href="https://colab.research.google.com/drive/1Egok9pP6vgV2gC2lVNIFH9v9SdcFoqY1?usp=sharing",
-                                target="_blank",  # Opens the link in a new tab
-                                style={'color': '#007bff', 'textDecoration': 'underline'}
-                            ),
-                            ".",
+                            "As can be observed from the table below, some topics like 23 and 24 contain words that do not belong to a coherent topic and are excluded. Topics like 2 (Religion) and 7 (Animal Welfare) were also excluded due to the likely rarity of these topics in parliament. Some topics like 18 were further split into sub-topics ('Military Defense and National Security' and 'Foreign Policy') based on our interpretation of the top words. Finally, topics 3, 4, and 19 were grouped under a single header of 'Urban Planning', again to minimize esoteric topics.",
                             html.Br(),
                             html.Br(),
                             topics_table,
