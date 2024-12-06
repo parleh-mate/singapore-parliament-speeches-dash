@@ -1,8 +1,5 @@
 from google.cloud import storage
 import pickle
-import os
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "tokens/gcp_token.json"
 
 # Initialize the GCS client
 storage_client = storage.Client()
