@@ -7,6 +7,7 @@ from scipy.stats import gaussian_kde
 import math
 
 from load_data import data
+from utils import top_k_rag
 
 df_topics = pd.read_csv("assets/topics_LDA.csv").sort_values("topic").drop(columns = "mean_word_weight")
 
@@ -182,28 +183,38 @@ def methodology_layout():
                     [
                         html.H1("Methodology"),
                         html.P(
-                            "This section describes how our data is sourced and transformed into the graphs and tables you see on the app. Our aim is to be as transparent as possible and provide users with the necessary context to understand what they are looking at. While best efforts are made to ensure the information is accurate, there may be inevitable parsing errors. Please use the information here with caution and check the underlying data."
+                            "This section describes how data is sourced and transformed into the graphs and tables you see on the app. While best efforts are made to ensure the information is accurate, there may be inevitable parsing errors. Please use the information here with caution and check the underlying data."
                         ),                        
                         # Table of Contents
                         html.Ul([
                             html.Li(html.A("Why is there no data before 2011?", href="#before-2012-faq")),
                             html.Li(html.A("Data Sourcing", href="#datasourcing-method")),
-                            html.Li(html.A("Participation", href="#participation-method")),
-                            html.Li(html.A("Speeches", href="#speeches-method")),
+                            
+                            # Member Metrics with nested sub-items
+                            html.Li([
+                                "Member Metrics",
+                                html.Ul([
+                                    html.Li(html.A("Participation", href="#participation-method")),
+                                    html.Li(html.A("Attendance", href="#attendance-method")),
+                                    html.Li(html.A("Speeches", href="#speeches-method")),
+                                    html.Li(html.A("Readability", href="#readability-method")),
+                                    html.Li(html.A("Questions", href="#questions-method")),
+                                ])
+                            ]),
                             html.Li(html.A("Topics", href="#topics-method")),
+                            html.Li(html.A("Policy Positions", href="#policy-method")),
                             html.Li(html.A("GPT Prompts", href="#gpt-method")),
-                            html.Li(html.A("Questions", href="#questions-method")),
                             html.Li(html.A("Demographics", href="#demographics-method")),
                         ]),
 
                         html.H2("Why is there no data before 2011?", id="before-2012-faq"),
                         html.P([
-                            "The API in principle provides all parliamentary data from 1955 to present. However the data format of speeches before 2011 is highly unstructured and will require a significant amount of time to manually parse, time that we as volunteers do not have. However it remains something we are keen to explore in the future."
+                            "The API in principle provides all parliamentary data from 1955 to present. However the data format of speeches before 2011 is highly unstructured and will require a significant amount of effort to parse. It remains something we are keen to explore in the future."
                         ]),
     
                         html.H2("Data Sourcing", id="datasourcing-method"),
                         html.P([
-                            "All data comes courtesy of the Singapore Parliament Hansards API. We automate a Python script to call the API at 00:00 SGT every day to check for the addition of new speeches. Speeches are usually added to the Hansards ~2 weeks after a sitting. New speeches are then pulled into a database on BigQuery before being transformed into cleaned data which we also host on BigQuery and use for our graphs. This is also when speech summaries and topic labels for new speeches are generated. Information on the data lineage can be found on the ",
+                            "All data comes courtesy of the Singapore Parliament Hansards API. A request is made to the API at 00:00 SGT every day to check for new speeches, which are usually added to the Hansards ~2 weeks after a sitting. Data is then cleaned and stored on BigQuery. Information on the data lineage can be found on the ",
                             html.A(
                                 "DBT documentation page",
                                 href="https://cloud.getdbt.com/accounts/237272/jobs/506988/docs/#!/overview",  # Replace with actual URL
@@ -219,36 +230,43 @@ def methodology_layout():
                             ),
                             " for more info."
                         ]),
-                        
-                        html.H2("Participation", id="participation-method"),
+                        html.H2("Member Metrics"),
+                        html.Br(),
+                        html.H3("Participation", id="participation-method", style={'marginLeft': '20px'}),
                         html.P([
-                            "We define an MP who spoke at least once during a sitting as having participated verbally in that session. This includes every form of verbal participation including procedural speeches but excludes written responses."
-                            ]),
-                        
-                        html.H2("Speeches", id="speeches-method"),
+                            "Participation is measured by the number of sessions in which the member spoke at least once as a proportion of the number of sessions the member attended. This includes every form of verbal participation including procedural speeches but excludes written responses. For example, in the 13th parliament Walter Theseira (NMP) had a participation rate of 94.2%, meaning that he spoke in 94.2% of the of 98.1% of sessions he attended."
+                            ], style={'marginLeft': '20px'}),
+                        html.H3("Attendance", id="attendance-method", style={'marginLeft': '20px'}),
                         html.P([
-                            "How are speeches summarized and labelled?",
-                            html.Br(),
-                            html.Br(),
-                            "Speeches are summarized to about 150 words with the help of GPT's 4o-mini model. We do not include written corrections, bill introductions, voting protocols, President's addresses, or speeches made by the Speaker (usually procedural in nature) since none of these can be really considered a parliamentary speech. We also make sure summaries are written in the third person to prevent wrongful attribution and limit the speeches passed to the API to between 70 and 2000 words. An upper word limit is necessary because of GPT's context length limit of ~4000 tokens, while a lower limit helps to exclude non-substantive procedural speeches. The idea is that a summary only makes sense if the speech is substantive. An example of a procedural speech is as follows:",
-                            html.Br(),
-                            html.Br()
-                        ]),                            
+                            "Attendance is measured by the number of sessions the member attended (or was present in) out of the total number of sessions which occurred while they were sitting as a member. For example, WP's Lee Li Lian won the Punggol East SMC by-election in January 2013 as the 12th parliament was underway. Her attendance is calculated as the proportion of the remaining 80 sittings she was qualified to attend instead of the total 89."
+                            ], style={'marginLeft': '20px'}),
+                        html.H3("Speeches", id="speeches-method", style={'marginLeft': '20px'}),
+                        html.P([
+                            "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does not include written answers, parliamentary questions, or the President's address. Members who made no speeches do not appear on the graph."
+                            ], style={'marginLeft': '20px'}),
+                        html.H3("Readability", id="readability-method", style={'marginLeft': '20px'}),
+                        html.P("To assess how readable a speech is, we use the Flesch-Kincaid score, a widely used index for measuring how difficult a text is to understand in English. The formula is as follows:"
+                            , style={'marginLeft': '20px'}),
+                        html.P(
+                            dcc.Markdown(r'$$206.835 - 1.015 \left( \frac{\text{total words}}{\text{total sentences}} \right) - 84.6 \left( \frac{\text{total syllables}}{\text{total words}} \right)$$', mathjax=True),
+                            style={'textAlign': 'center'}
+                        ),
+                        html.P("The index scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. Members who did not speak do not have a readability score and will not appear on the graph. Vernacular speeches are also not given a readability score since the index only works for English.", style={'marginLeft': '20px'}),
+                        html.H3("Questions", id="questions-method", style={'marginLeft': '20px'}),
+                        html.P(
+                            "Parliamentary questions (PQ) do not come labelled in the raw data and are only identified during the data modelling process. Fortunately, they are also almost always recorded in the Hansards in the following format: 'asked the <insert minister here> <insert question here>'. For example, the PQ below was directed by Don Wee (PAP) during a sitting in Parliament 14.",
+                            style={'marginLeft': '20px'}
+                        ),
                         html.Blockquote([
-                            '"Mdm Speaker, may I ask the Member to clarify his first question? What does he mean by "supplementary schemes"?"',
+                            '"asked the Minister for Sustainability and the Environment what are the criteria, such as the number of dwelling units, to set up a hawker centre and wet market within a constituency."',
                             ],
-                            className="blockquote"
+                            className="blockquote",
+                            style={'marginLeft': '20px'}
                             ),
-                        html.P([
-                            html.Br(),
-                            "The speech is from a sitting in the 12th Parliament by Sim Ann (PAP) and is an example of something that is procedural and too unsubstantive to be worth summarizing. Ultimately 70 words corresponds to about a 30-second speech which we do not believe conveys much information even if substantive in nature. Imposing a strict word-limit is also much quicker than manually going through each speech to determine if they are substantive. The following graph highlights the distribution of speech lengths and what we exclude in our summaries.",
-                            dcc.Graph(
-                                id='speeches-length-graph',
-                                figure=fig,
-                                config={"responsive": True},
-                                style={'minHeight': '300px'}
-                                )
-                        ]),    
+                        html.P(
+                            "We use this information to determine if 1) a speech was a question, and 2) which ministry the question was directed towards. Note that cabinet ministers do not raise questions but answer them instead.",
+                            style={'marginLeft': '20px'}
+                        ),                  
                         html.H2("Topics", id="topics-method"),
                         html.P([
                             "Topics are labelled by GPT and are done at the same time as speech summarization. Our approach to topic labelling is semi-principled and involves a combination of unsupervised topic modelling and human interpretation to identify a set list of topics which we then pass to GPT. We first use a Latent Dirichlet Allocation (LDA) model to group words into 25 topics. We then use our own subjective judgement to label each topic based on the top 15 most important words in each topic, and then decide if a topic is relevant enough to be included in the final list. We end up with a list of 17 topics.",
@@ -267,44 +285,32 @@ def methodology_layout():
                             ".",
                             html.Br(),
                             html.Br(),
-                            topics_table
+                            topics_table,
+                            html.Br()
                         ]),    
-                        html.H2("GPT Prompts", id="gpt-method"),
+                        html.H2("Policy Positions", id="policy-method"),
                         html.P([
-                            "Our summaries and topics are outputs from a GPT 4o-mini model using GPT's batch API. We also explored the use of Claude's Opus and Sonnet models but these were costlier and performed poorer at summarization across a random sample of speeches. The GPT model employs one-shot learning, meaning each request to summarize and label a speech is independent and the model does not get feedback or 'fine-tuned' after each attempt. To compensate for this, we specify clear, step by step instructions for how the model should perform summarization.",
-                            html.Br(),
-                            html.Br(),
-                            "We find summary performance reasonable, though in <1% of cases the model still hallucinates new topics even after being told explicity not to. In these cases the output is not accepted and the model will try again with a different batch. It is important to note that LLM models can still make errors despite their high-level competency in natural language tasks. As these models improve in cost and capability, so we strive to also improve our summaries and topic labels. Our current prompts are as follows:",
-                            html.Br(),
-                            html.Br(),
-                            html.H4("System Message:"),
-                            gpt_df.system_message[0].replace('\n','').strip(),
-                            html.Br(),
-                            html.Br(),
-                            html.H4("Output Summary Description:"),
-                            *eval(output_sum),
-                            html.Br(),
-                            html.Br(),
-                            html.H4("Output Topic Description:"),
-                            *eval(output_topic)
-                            
-                    ]),  
-                
-                        html.H2("Questions", id="questions-method"),
-                        html.P(
-                            "Speeches do not come labelled as parliamentary questions (PQ) in the raw data and labels are supplemented by us in the data modelling process. Fortunately, they are also almost always recorded in the Hansards in the following format: 'asked the <insert minister here> <insert question here>'. For example, the PQ below was directed by Don Wee (PAP) during a sitting in Parliament 14."
-                        ),
+                            dcc.Markdown(f"Policy positions are generated by summarizing the top {top_k_rag} speech summaries most related to the user-submitted query. Indexing of related speeches is done using a vector database and GPT's `text-embedding-3-small` model, while speech summaries are pre-generated using GPT's `4o-mini` model. We use speech summaries instead of raw speeches since this is quicker and more cost efficient, though possibly at the risk of some information loss. Only speeches between 70-2000 words are summarized. These do not include written corrections, bill introductions, voting protocols, President's addresses, or speeches made by the Speaker (usually procedural in nature) since none of these can be really considered a parliamentary speech. The word limit is imposed to exclude extremely long speeches or short procedural ones like the following:"),
+                            html.Br()
+                        ]),                            
                         html.Blockquote([
-                            '"asked the Minister for Sustainability and the Environment what are the criteria, such as the number of dwelling units, to set up a hawker centre and wet market within a constituency."',
+                            '"Mdm Speaker, may I ask the Member to clarify his first question? What does he mean by "supplementary schemes"?"',
                             ],
                             className="blockquote"
                             ),
-                        html.P(
-                            "We use this information to determine if 1) a speech was a question, and 2) which ministry the question was directed towards. It is important to note that cabinet ministers do not raise questions but answer them instead."
-                        ),                        
+                        html.P([
+                            html.Br(),
+                            "The following graph highlights the distribution of speech lengths and what we exclude in our summaries. Information on our GPT prompts can be found in the Github repository.",
+                            dcc.Graph(
+                                id='speeches-length-graph',
+                                figure=fig,
+                                config={"responsive": True},
+                                style={'minHeight': '300px'}
+                                )
+                        ]),    
                         html.H2("Demographics", id="demographics-method"),
                         html.P([
-                            "We use year-age in place of actual age due to the lack of information on birthdates, though this should not make much difference to the analysis. Because MPs can come and go during the lifetime of an entire parliament session (especially NMPs), we chose to look at an MP's age at first sitting rather than the age of parliament at specific time frames. The former answers the question 'How old are parliamentarians in general when they enter parliament?' and gives an insight into party preferences on the age of candidates who are fielded.",
+                            "We use year-age in place of actual age due to the lack of information on birthdates. Because MPs can come and go during the lifetime of an entire parliament session (especially NMPs), we look at an MP's age at their first sitting rather than at the start of session.",
                             html.Br(),
                             html.Br(),
                             "The parliamentary Hansards comes with information on an MP's gender but not ethnicity. Where possible, we locate this information through manual web searches, otherwise it is derived by looking at the name. In most cases this is straightforward, but in some we remain unsure. For example, Walter Theseira (NMP) and Christopher de Souza (PAP) were labelled as 'Others', while Mohamed Irshad (NMP) was labelled as Indian."
