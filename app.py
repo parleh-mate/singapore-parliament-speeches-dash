@@ -17,6 +17,8 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
                                                 "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
 ], suppress_callback_exceptions=True)
 
+app.title = 'Parleh-mate!'
+
 server = app.server  # Expose the Flask app as a variable
 
 # Offcanvas for mobile
