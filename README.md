@@ -1,6 +1,6 @@
 # Parleh-mate Dash App
 
-Dash App with visuals for speech data and UI for speech and bill summarizers. Currently hosted on [Render](https://parlehmate.onrender.com/)
+Dash App with visuals for speech data and UI for speech and bill summarizers. Currently hosted on [Render](https://parlehmate.onrender.com/).
 
 ## Initialisation
 
