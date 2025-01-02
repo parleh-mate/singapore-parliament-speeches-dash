@@ -49,7 +49,7 @@ def member_metrics_layout():
                     
                     # Tooltip Component
                     dbc.Tooltip(
-                        "'All' takes the average across all parliamentary sittings from the 12th parliament to current",
+                        "'All' takes the average across all parliamentary sittings from the 12th parliament to current. Note that info for the 12th parliament is incomplete - refer to the methodology for more info.",
                         target="member-metrics-parliament-session-info-icon",  # Link tooltip to the icon's ID
                         placement="right",                      # Position the tooltip to the right of the icon
                         style={

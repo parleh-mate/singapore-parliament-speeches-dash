@@ -28,6 +28,15 @@ parliaments = {
     "All": 'All'
 }
 
+parliaments_bills = {
+    "10th (2002-2006)": '10',
+    "11th (2006-2011)": '11',
+    "12th (2011-2015)": '12',
+    "13th (2016-2020)": '13',
+    "14th (2020-present)": '14',
+    "All": 'All'
+}
+
 parliament_parties = {
     '12': ['NMP', 'PAP', 'PSP', 'WP'],
     '13': ['NMP', 'PAP', 'WP'],
@@ -49,6 +58,8 @@ member_metrics_options = {
 # query embedding model
 embedding_model = "text-embedding-3-small"
 
+summarize_policy_model = "gpt-4o"
+
 # get prompts for GPT summary
 
 try_again_message = 'Your query did not return any relevant entries, please try again with something else or perhaps something less specific.'
@@ -65,7 +76,7 @@ def get_response_format(query, uoa):
 
     3. In the case of esoteric queries, it may be the case that no policy positions retrieved are relevant. In this case, do not hallucinate non-existent policy positions. Instead, return an output saying '{try_again_message}'
 
-    Writing style: Begin your summary with 'The [insert unit of analysis]'s position on...'. The unit of analysis can either be the Party, Constituency, or MP. In this case the unit of analysis is the {uoa}. Use the third-person like 'the Party', 'the Constituency', or 'the MP' when referring to them rather than their actual names. Write in concise manner, avoiding tautology.
+    Writing style: Begin your summary with 'The [insert unit of analysis]'s position on...'. The unit of analysis can either be the Party, Constituency, or MP. In this case the unit of analysis is the {uoa}. Use the third-person like 'the Party', 'the Constituency', or 'the MP' when referring to them rather than their actual names. Write in concise manner, avoiding tautology. On rare occassions, a Party or Constituency has no united position on an issue due to the party whip being lifted. State this if this is the case.
     """
 
     policy_point_description = """Based on the description you have created for the policy position, list specific bullet point examples of no more than 5 policies that justify your decision to describe the policy position in that specific way. You should not take wholesale the policy points that were passed into the model, rather, look at the policy positions from all the speeches that were passed, and construct coherent policies that were suggested that support your description above.
@@ -81,6 +92,8 @@ def get_response_format(query, uoa):
 
 # top k for RAG
 
-top_k_rag = 10
+top_k_rag_policy_positions = 10
+top_k_rag_bill_summaries = 50
 
-rag_index = "singapore-speeches-positions"
+policy_positions_rag_index = "singapore-speeches-positions"
+bill_summaries_rag_index = "singapore-bill-summaries"

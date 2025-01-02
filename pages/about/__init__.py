@@ -12,7 +12,7 @@ def about_layout():
                             "Parleh-mate is a non partisan, independent project with no affiliation to the Singapore Parliament or government whatsoever. It was created with the intention of shedding light on the goings-on in the Singapore Parliament. Our goal is to make more accessible information that is already out there and allow users to draw their own conclusions.",
                             html.Br(),    
                             html.Br(),                            
-                            "The project is wholly maintained by a group of volunteers - this involves investing not just time but also our own funds to create and maintain cloud resources. If you find this resource useful, consider ",
+                            "The project is wholly maintained by a group of volunteers. If you find this resource useful, consider ",
                             html.A(
                                 "buying us a coffee",
                                 href="https://buymeacoffee.com/parlehmate", 
@@ -23,7 +23,7 @@ def about_layout():
                     ]),
                         html.Br(),
                         html.P([
-                            "Please send email inquiries to xx. For more information visit the ",
+                            "Please send email inquiries to jonahfoong@gmail.com. For more information visit the ",
                             html.A(
                                 "Github repository",
                                 href="https://github.com/parleh-mate",

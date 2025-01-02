@@ -17,7 +17,7 @@ parliament_sessions_demo = [i for i in parliament_sessions if i!="All"]
 def demographics_layout():
     return html.Div(
         [
-            html.H1("Parliamentary demographics Analysis"),
+            html.H1("Parliamentary Demographics"),
             
             # Dropdowns Section
             dbc.Row([
