@@ -97,3 +97,10 @@ top_k_rag_bill_summaries = 50
 
 policy_positions_rag_index = "singapore-speeches-positions"
 bill_summaries_rag_index = "singapore-bill-summaries"
+
+# bills page size
+bills_page_size = 10
+
+# policy position thresholds
+position_threshold_low = 70
+position_threshold_high = 2000
