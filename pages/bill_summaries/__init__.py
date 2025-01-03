@@ -1,58 +1,114 @@
-from dash import html, dcc, Input, Output, State, callback_context, ALL
+from dash import html, dcc, Input, Output, State, callback_context, ALL, MATCH
 import dash_bootstrap_components as dbc
 import pandas as pd
 from pinecone import Pinecone
-import json
 
 from query_vectors import query_vector_embeddings
-from utils import parliaments_bills, top_k_rag_bill_summaries, bill_summaries_rag_index
+from utils import parliaments_bills, top_k_rag_bill_summaries, bill_summaries_rag_index, bills_page_size
 
-# pinecone client
+# Pinecone client
 pc = Pinecone()
 index = pc.Index(bill_summaries_rag_index)
-
-
-# Constants for pagination
-PAGE_SIZE = 5
 
 def get_bill_cards(df):
     bill_cards = []
     for ind, row in df.iterrows():
+        # Unique identifiers for the buttons and collapse
+        read_more_id = {'type': 'read-more-button', 'index': ind}
+        read_less_id = {'type': 'read-less-button', 'index': ind}
+        collapse_id = {'type': 'collapse-content', 'index': ind}
+        
         card = dbc.Card(
             dbc.CardBody(
-                dbc.Row([
-                    dbc.Col(
-                        [
+                html.Div([
+                    # Top Section: Introduction and Dates
+                    dbc.Row([
+                        # Introduction Paragraph and Title
+                        dbc.Col([
                             html.H4(row.title, className="card-title"),
-                            html.Br(),
-                            html.H6("Introduction", className="card-subtitle"),
                             html.P(row.bill_introduction, className="card-text"),
-                            html.H6("Key Points", className="card-subtitle"),
-                            html.Ul([html.Li(i.strip()) for i in row.bill_key_points.split("-") if len(i)!=0], className="card-text"),
-                            html.H6("Impact", className="card-subtitle"),
-                            html.P(row.bill_impact, className="card-text"),
                         ],
-                        md=8  # 8 out of 12 columns
+                            md=8,  # 8 out of 12 columns on medium to large screens
+                            xs=12  # Full width on extra small screens
+                        ),
+                        # Dates Section
+                        dbc.Col(
+                            html.Div([
+                                html.H5(f"Nr: {row.bill_number}"),
+                                html.H6("Date Introduced:", className="card-subtitle"),
+                                html.P(row.date_introduced.strftime('%Y-%m-%d') if pd.notna(row.date_introduced) else "N/A"),
+                                html.H6("Date Passed:", className="card-subtitle"),
+                                html.P("Not yet passed" if pd.isna(row.date_passed) else row.date_passed.strftime('%Y-%m-%d'))
+                            ]),
+                            md=4,  # 4 out of 12 columns on medium to large screens
+                            xs=12  # Full width on extra small screens
+                        )
+                    ], className="align-items-top"),
+                    
+                    html.Br(),
+                    
+                    # Read More Button (Visible only when collapsed)
+                    dbc.Button(
+                        "Read More",
+                        id=read_more_id,
+                        color="link",
+                        className="p-0",
+                        n_clicks=0,
+                        style={'display': 'block'}  # Initially visible
                     ),
-                    dbc.Col(
-                        [
-                            html.H6("Date Introduced"),
-                            html.P(row.date_introduced),
-                            html.H6("Date Passed"),
-                            html.P("Not yet passed" if pd.isna(row.date_passed) else row.date_passed),
-                        ],
-                        md=4,  # 4 out of 12 columns
-                        style={"borderLeft": "1px solid #ddd", "paddingLeft": "20px"}
+                    
+                    # Collapsible Content
+                    dbc.Collapse(
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col(
+                                    [
+                                        # Key Points
+                                        html.H6("Key Points", className="card-subtitle"),
+                                        html.Ul(
+                                            [html.Li(i.strip()) for i in row.bill_key_points.split("-") if len(i) != 0],
+                                            className="card-text"
+                                        ),
+                                        
+                                        # Impact
+                                        html.H6("Impact", className="card-subtitle"),
+                                        html.P(row.bill_impact, className="card-text"),
+                                    ],
+                                    md=8  # 8 out of 12 columns
+                                ),
+                                dbc.Col(
+                                    [
+                                        # Placeholder for alignment or additional content
+                                    ],
+                                    md=4  # 4 out of 12 columns
+                                )
+                            ]),
+                            
+                            # Read Less Button (Visible only when expanded)
+                            dbc.Button(
+                                "Read Less",
+                                id=read_less_id,
+                                color="link",
+                                className="p-0 mt-3 read-less-button-class",  # Added class for JS
+                                n_clicks=0,
+                                style={'display': 'block'}  # Visible when expanded
+                            )
+                        ]),
+                        id=collapse_id,
+                        is_open=False
                     )
                 ])
             ),
             className="mb-4"
         )
-        bill_cards.append(card)
+        # Wrap the card in a div with a unique id
+        wrapped_card = html.Div(card, id=f"bill-card-{ind}")
+        bill_cards.append(wrapped_card)
     
     return bill_cards
 
-# Updated Function to generate pagination controls with dynamic window
+
+# Function to generate pagination controls with dynamic window
 def generate_pagination(total_pages, current_page):
     pagination_items = []
 
@@ -148,7 +204,7 @@ def generate_pagination(total_pages, current_page):
 
     return dbc.Nav(pagination_items, className="justify-content-center")
 
-# Layout for the Topic Summaries Page with Pagination
+# Layout for the Bill Summaries Page with Pagination
 def bill_summaries_layout():
     return html.Div(
         [
@@ -168,7 +224,7 @@ def bill_summaries_layout():
                         searchable=False,
                         clearable=False
                     ),
-                ], md=3),
+                ], md=4),
                 # Search Input and Button
                 dbc.Col([
                     dbc.InputGroup([
@@ -184,7 +240,7 @@ def bill_summaries_layout():
                             className='ms-2'
                         )
                     ]),
-                ], md=8),
+                ], md=7),
                 # Info Icon and Tooltip
                 dbc.Col([
                     html.Span(
@@ -203,7 +259,7 @@ def bill_summaries_layout():
                     dbc.Tooltip(
                         "Leaving the search bar empty retrieves all bills (in the database) for the given parliament. Entering a search query returns the top 50 most relevant bills to the query, ordered from most to least relevant.",
                         target="bills-search-info-icon",  # Link tooltip to the icon's ID
-                        placement="right",                      # Position the tooltip to the right of the icon
+                        placement="right",                # Position the tooltip to the right of the icon
                         style={
                             "maxWidth": "300px",
                             "textAlign": "left"  # Ensure text is left-aligned within the tooltip
@@ -217,10 +273,10 @@ def bill_summaries_layout():
                     dbc.AccordionItem(
                         [
                             html.P(f"""
-                                   Summaries are generated by querying the {top_k_rag_bill_summaries} most relevant pre-summarized speeches to the user's query and summarizing again using GPT. Please refer to the methodology section for more info.""")
+                                   Bill summaries are generated using GPT and retrieved using vector embeddings. We cap maximum retrievals at {top_k_rag_bill_summaries} to increase speed and reduce cost. Please refer to the methodology section for more info.""")
                         ],
                         title=html.Span(
-                            "How are summaries generated?",
+                            "How are bill summaries generated and retrieved?",
                             style={
                                 "fontWeight": "bold",
                                 "fontSize": "1.1rem"  # Optional: Increase font size
@@ -249,15 +305,42 @@ def bill_summaries_layout():
             dcc.Store(id='filtered-data-store'),
             # Hidden Store to keep track of the current page
             dcc.Store(id='current-page-store', data=1),
-            # Hidden Div to trigger scroll to top
+            # Hidden Div to trigger scroll to top (for pagination)
             html.Div(id='scroll-trigger', style={'display': 'none'}),            
-            # Hidden Div to handle scroll action
-            html.Div(id='scroll-action', style={'display': 'none'})
+            # Hidden Div to handle scroll action after pagination
+            html.Div(id='scroll-action', style={'display': 'none'}),
+            # Removed 'scroll-store-collapse' and related Div
         ],
         className='content'
     )
 
-def bill_summaries_callbacks(app, data):   
+def bill_summaries_callbacks(app, data):
+    # Callback to toggle the collapse for "Read More" and "Read Less" buttons
+    @app.callback(
+        Output({'type': 'collapse-content', 'index': MATCH}, 'is_open'),
+        [
+            Input({'type': 'read-more-button', 'index': MATCH}, 'n_clicks'),
+            Input({'type': 'read-less-button', 'index': MATCH}, 'n_clicks'),
+        ],
+        State({'type': 'collapse-content', 'index': MATCH}, 'is_open'),
+    )
+    def toggle_collapse(n_clicks_more, n_clicks_less, is_open):
+        if n_clicks_more or n_clicks_less:
+            return not is_open
+        return is_open
+
+    # Callback to toggle "Read More" button visibility based on 'is_open' state
+    @app.callback(
+        Output({'type': 'read-more-button', 'index': MATCH}, 'style'),
+        Input({'type': 'collapse-content', 'index': MATCH}, 'is_open')
+    )
+    def toggle_read_more_button(is_open):
+        if is_open:
+            return {'display': 'none'}
+        else:
+            return {'display': 'block'}
+
+    # Removed the problematic callback that outputs to 'scroll-store-collapse.data'
 
     # Callback to filter data based on search button click
     @app.callback(
@@ -267,25 +350,27 @@ def bill_summaries_callbacks(app, data):
         State('text-input-bills', 'value')
     )
     def filter_bills(n_clicks, selected_parliament, search_query):
-
-        bills_df = data['bill_summaries'].sort_values("date_introduced", ascending = False)
+        bills_df = data['bill_summaries']
+        bills_df[['number', 'year']] = bills_df['bill_number'].str.split(r'/', expand=True).astype(int)
+        bills_df = bills_df.sort_values(['year', 'number'], ascending = [False, False])        
 
         if n_clicks is None:
             # Initial load or "All" selected: show all bills
             filtered_df = bills_df.copy()
         else:
-            if selected_parliament=='All':
+            if selected_parliament == "All":
                 filtered_df = bills_df.copy()
             else:
                 filtered_df = bills_df[bills_df['parliament'] == int(parliaments_bills[selected_parliament])]
-        # now filter again if query was made
+        
+        # Now filter again if query was made
         if search_query:
-            parliament = None if selected_parliament=="All" else int(parliaments_bills[selected_parliament])
+            parliament = None if selected_parliament == "All" else int(parliaments_bills[selected_parliament])
             responses = query_vector_embeddings(search_query, top_k_rag_bill_summaries, index, parliament=parliament, include_metadata=False)
             bill_numbers = [i['id'] for i in responses]
             filtered_df = filtered_df[filtered_df.bill_number.isin(bill_numbers)] 
 
-            # now sort order by relevance
+            # Now sort order by relevance
             filtered_df['bill_number'] = pd.Categorical(filtered_df['bill_number'], categories=bill_numbers, ordered=True)
             filtered_df = filtered_df.sort_values('bill_number').reset_index(drop=True)               
 
@@ -315,11 +400,13 @@ def bill_summaries_callbacks(app, data):
         if not ctx.triggered:
             # No trigger yet, display the first page
             current_page = 1
+            scroll_trigger = 'scroll'  # Trigger scroll on initial load if desired
         else:
             triggered = ctx.triggered[0]['prop_id'].split('.')[0]
             if triggered == 'filtered-data-store':
-                # When filtered data is updated, reset to page 1
+                # When filtered data is updated (search performed), reset to page 1
                 current_page = 1
+                scroll_trigger = None  # Do NOT trigger scroll
             else:
                 # Handle pagination button clicks
                 # Find which button was clicked
@@ -328,7 +415,7 @@ def bill_summaries_callbacks(app, data):
                         if id_dict['index'] == 'prev':
                             current_page = max(1, current_page - 1)
                         elif id_dict['index'] == 'next':
-                            total_pages = (len(filtered_data) + PAGE_SIZE - 1) // PAGE_SIZE
+                            total_pages = (len(filtered_data) + bills_page_size - 1) // bills_page_size
                             current_page = min(total_pages, current_page + 1)
                         else:
                             # Assume it's a page number
@@ -337,6 +424,9 @@ def bill_summaries_callbacks(app, data):
                 else:
                     # If no button was clicked, retain current_page
                     pass
+
+                # Trigger scroll to top by setting 'scroll_trigger' to 'scroll'
+                scroll_trigger = 'scroll'
 
         # Convert filtered_data back to DataFrame
         if filtered_data:
@@ -348,7 +438,7 @@ def bill_summaries_callbacks(app, data):
             # If no data is filtered, return an empty DataFrame
             filtered_df = pd.DataFrame()
 
-        total_pages = (len(filtered_df) + PAGE_SIZE - 1) // PAGE_SIZE
+        total_pages = (len(filtered_df) + bills_page_size - 1) // bills_page_size
         total_pages = max(1, total_pages)  # Ensure at least one page
 
         # Ensure current_page is within bounds
@@ -360,8 +450,8 @@ def bill_summaries_callbacks(app, data):
             pagination = ""
             scroll_trigger = None  # No need to trigger scroll
         else:
-            start = (current_page - 1) * PAGE_SIZE
-            end = start + PAGE_SIZE
+            start = (current_page - 1) * bills_page_size
+            end = start + bills_page_size
             current_bills = filtered_df.iloc[start:end]
 
             # Generate bill cards
@@ -370,26 +460,46 @@ def bill_summaries_callbacks(app, data):
             # Generate pagination controls with dynamic window
             pagination = generate_pagination(total_pages, current_page)
 
-            # Trigger scroll to top by updating 'scroll-trigger.children'
-            scroll_trigger = current_page
+            # Only set scroll_trigger if triggered by pagination
+            if triggered != 'filtered-data-store':
+                scroll_trigger = 'scroll'
+            else:
+                scroll_trigger = None
 
         # Update the current page store
         updated_current_page = current_page
 
         return bill_cards, pagination, scroll_trigger, updated_current_page
 
-
-    # Clientside callback to scroll to top
+    # Clientsided callback to scroll to top after pagination
     app.clientside_callback(
         """
         function(scroll_value) {
-            if(scroll_value) {
-                window.scrollTo(0, 0);
+            if(scroll_value === 'scroll') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
             return '';
         }
         """,
         Output('scroll-action', 'children'),
         Input('scroll-trigger', 'children'),
+        prevent_initial_call=True
+    )
+
+    # Clientsided callback to scroll to the specific card after collapsing
+    app.clientside_callback(
+        """
+        function(card_id) {
+            if(card_id) {
+                var element = document.getElementById(card_id);
+                if(element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+            return '';
+        }
+        """,
+        Output('scroll-action-collapse', 'children'),
+        Input('scroll-store-collapse', 'data'),
         prevent_initial_call=True
     )
