@@ -1,5 +1,15 @@
 /* custom.css */
 
+/* Override paragraph text color */
+p {
+    color: black !important;
+}
+
+/* Override list item text color */
+li {
+    color: black !important;
+}
+
 /* Adjust content padding when sidebar is hidden (mobile view) */
 @media screen and (max-width: 767px) {
     .content {
