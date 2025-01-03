@@ -129,12 +129,19 @@ def member_metrics_layout():
                                     "Speeches refers to any time a member speaks to address the chamber as recorded in the parliamentary Hansard. This includes substantial and procedural points but does not include written answers, parliamentary questions, or the President's address. Members who made no speeches do not appear on the graph.",
                                     html.Br(),
                                     html.Br(),
-                                    "To assess how readable a speech is, we use the Flesch-Kincaid score, a well-known index for measuring how difficult a text is to understand in English. The index scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. The full formula and interpretation guide can be found in the methodology section. Members who did not speak do not have a readability score and will not appear on the graph. Vernacular speeches are also not given a readability score since the index only works for English. Please refer to the methodology for more info."
+                                    "To assess how readable a speech is, we use the Flesch-Kincaid score, a well-known index for measuring how difficult a text is to understand in English. The index scales from 0 to 100, with 0 indicating extremely difficult and 100 very easy. Generally, a score of between 30-50 is a college level text, while 10-30 is college-graduate level. Members who did not speak do not have a readability score and will not appear on the graph. Vernacular speeches are also not given a readability score since the index only works for English. ",
+                                    html.Br(),
+                                    html.Br(),
+                                    "Attendance is measured by the number of sessions the member attended (or was present in) out of the total number of sessions which occurred while they were sitting as a member. For example, WP's Lee Li Lian won the Punggol East SMC by-election in January 2013 as the 12th parliament was underway. Her attendance is calculated as the proportion of the remaining 80 sittings she was qualified to attend instead of the total 89.",
+                                    html.Br(),
+                                    html.Br(),
+                                    "Participation is measured by the number of sessions in which the member spoke at least once as a proportion of the number of sessions the member attended. For example, in the 13th parliament Walter Theseira (NMP) had a participation rate of 94.2%, meaning that he spoke in 94.2% of the of 98.1% of sessions he attended. Please refer to the methodology for more info."
+                                    
                                 ]
                             )
                         ],
                         title=html.Span(
-                            "How are speech and readability score defined?",
+                            "How are metrics defined?",
                             style={
                                 "fontWeight": "bold",
                                 "fontSize": "1.1rem"  # Optional: Increase font size

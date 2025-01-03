@@ -2,13 +2,46 @@ from dash import html
 import dash_bootstrap_components as dbc
 from dash_iconify import DashIconify
 
-# Home page layout
-home_page = html.Div(
+home_page = dbc.Container(
     [
-        html.H2("Find out what's going on in the SG Parliament!"),
-        html.P("Note that this is still a work in progress!"),
-    ]
+        dbc.Row(
+            dbc.Col(
+                [
+                    # Header
+                    html.H3(
+                        "Find out what's going on in the Singapore Parliament!",
+                        style={"margin-bottom": "10px"}  # Optional: Adds space below the header
+                    ),
+                    
+                    # Image Insertion
+                    html.Img(
+                        src="/assets/singapore_parliament_house.png",
+                        alt="Singapore Parliament House",
+                        className="img-fluid",  # Makes the image responsive
+                        style={"width": "100%", "display": "block", "margin-left": "auto", "margin-right": "auto"}  # Full width, centered
+                    ),
+                    
+                    # Caption for the Image
+                    html.Small(
+                        "ProjectManhattan., CC BY-SA 3.0, via Wikimedia Commons",
+                        className="text-muted",  # Applies muted text color
+                        style={"display": "block", "margin-top": "5px"}  # Ensures caption is below the image with a small top margin
+                    )
+                ],
+                width=12,  # Makes the column span the full width of the container
+                className="text-center"  # Centers all content within the column
+            )
+        )
+    ],
+    fluid=True,  # Makes the container full-width relative to the viewport
+    style={
+        "padding-left": "50px",    # 50px padding on the left
+        "padding-right": "50px",   # 50px padding on the right
+        "padding-top": "50px",     # 50px padding at the top
+        "padding-bottom": "0px"    # No padding at the bottom
+    }
 )
+
 
 # Navbar
 import dash_bootstrap_components as dbc

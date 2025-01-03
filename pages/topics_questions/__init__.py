@@ -83,12 +83,12 @@ def topics_questions_layout():
                         [
                             html.P(
                                 [
-                                    "Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info."
+                                    "Topics are assigned to speeches by GPT based on a set list of topics generated using a combination of unsupervised modeling and subjective human interpretation of model outputs. Questions refer to parliamentary questions in which members direct inquiries specifically to ministries. Cabinet ministers do not raise questions. Please refer to the methodology for more info."
                                 ]
                             )
                         ],
                         title=html.Span(
-                            "How to understand these graphs?",
+                            "What do topics and questions refer to?",
                             style={
                                 "fontWeight": "bold",
                                 "fontSize": "1.1rem"  # Optional: Increase font size
