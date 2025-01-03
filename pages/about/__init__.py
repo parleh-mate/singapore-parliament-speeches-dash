@@ -23,7 +23,7 @@ def about_layout():
                     ]),
                         html.Br(),
                         html.P([
-                            "Please send email inquiries to jonahfoong@gmail.com. For more information visit the ",
+                            "Please send email inquiries to singapore.parliament.speeches@gmail.com. For more information visit the ",
                             html.A(
                                 "Github repository",
                                 href="https://github.com/parleh-mate",
