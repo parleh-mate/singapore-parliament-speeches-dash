@@ -1,5 +1,18 @@
 /* custom.css */
 
+/* Default: non-sticky */
+.sticky-toc {
+    position: static;
+}
+
+/* Apply sticky only on large screens and above (≥992px) */
+@media (min-width: 768px) {
+    .sticky-toc {
+        position: sticky;
+        top: 100px; /* Adjust as needed */
+    }
+}
+
 /* Override paragraph text color */
 p {
     color: black !important;

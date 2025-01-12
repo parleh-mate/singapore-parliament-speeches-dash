@@ -35,8 +35,6 @@ def methodology_layout():
             ]),
         ],
         style={
-            'position': 'sticky',
-            'top': '20px',
             'padding': '20px',
             'backgroundColor': '#f8f9fa',
             'borderRadius': '5px',
@@ -162,24 +160,27 @@ def methodology_layout():
     return dbc.Container(
         dbc.Row(
             [
-                # Main Content Column
-                dbc.Col(
-                    main_content,
-                    width=9
-                ),
                 # Table of Contents Sidebar Column
                 dbc.Col(
                     toc,
-                    width=3,
-                    style={
-                        'position': 'sticky',
-                        'top': '20px',
-                        'height': 'fit-content'
-                    }
+                    xs=12,  # Full width on extra small screens
+                    md=3,  # 3/12 width on medium and larger screens
+                    className='sticky-toc order-1 order-md-2',  # Order: 1 on xs, 2 on md+
+                ),
+                # Main Content Column
+                dbc.Col(
+                    main_content,
+                    xs=12,  # Full width on extra small screens
+                    md=9,  # 9/12 width on medium and larger screens
+                    className='order-2 order-md-1',  # Order: 2 on xs, 1 on md+
+                    style={'marginTop': '20px'}  # Optional: add some top margin on small screens
                 ),
             ],
             align="start",
-            justify="start"
+            justify="start",
+            # Add responsive ordering to ensure ToC comes first on small screens
+            # and remains on the side on larger screens
+            # This is already handled by the order of dbc.Col in the Row
         ),
         fluid=True,
         style={'padding': '20px'}
