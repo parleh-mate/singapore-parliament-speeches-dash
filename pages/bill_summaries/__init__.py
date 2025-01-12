@@ -66,7 +66,7 @@ def get_bill_cards(df):
                                         # Key Points
                                         html.H6("Key Points", className="card-subtitle"),
                                         html.Ul(
-                                            [html.Li(i.strip()) for i in row.bill_key_points.split("-") if len(i) != 0],
+                                            [html.Li(i.strip()) for i in row.bill_key_points.split("- ") if len(i) != 0],
                                             className="card-text"
                                         ),
                                         
