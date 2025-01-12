@@ -28,7 +28,7 @@ def get_bill_cards(df):
                             html.H4(row.title, className="card-title"),
                             html.P(row.bill_introduction, className="card-text"),
                         ],
-                            md=8,  # 8 out of 12 columns on medium to large screens
+                            md=9,  # 9 out of 12 columns on medium to large screens
                             xs=12  # Full width on extra small screens
                         ),
                         # Dates Section
@@ -40,7 +40,7 @@ def get_bill_cards(df):
                                 html.H6("Date Passed:", className="card-subtitle"),
                                 html.P("Not yet passed" if pd.isna(row.date_passed) else row.date_passed.strftime('%Y-%m-%d'))
                             ]),
-                            md=4,  # 4 out of 12 columns on medium to large screens
+                            md=3,  # 3 out of 12 columns on medium to large screens
                             xs=12  # Full width on extra small screens
                         )
                     ], className="align-items-top"),
@@ -48,13 +48,26 @@ def get_bill_cards(df):
                     html.Br(),
                     
                     # Read More Button (Visible only when collapsed)
-                    dbc.Button(
-                        "Read More",
-                        id=read_more_id,
-                        color="link",
-                        className="p-0",
-                        n_clicks=0,
-                        style={'display': 'block'}  # Initially visible
+                    dbc.Row(
+                        dbc.Col(
+                            dbc.Button(
+                                "Read More",
+                                id=read_more_id,
+                                color="link",
+                                className="p-2 w-100",  # Full width with padding
+                                n_clicks=0,
+                                style={
+                                    'textAlign': 'center',
+                                    'cursor': 'pointer',
+                                    'marginTop': '10px'
+                                }
+                            ),
+                            width=12
+                        ),
+                        style={
+                            'backgroundColor': '#ebedf0',
+                            'borderTop': '1px solid #dee2e6'  # Optional: add a top border for separation
+                        }
                     ),
                     
                     # Collapsible Content
@@ -84,14 +97,29 @@ def get_bill_cards(df):
                                 )
                             ]),
                             
+                            html.Br(),
+                            
                             # Read Less Button (Visible only when expanded)
-                            dbc.Button(
-                                "Read Less",
-                                id=read_less_id,
-                                color="link",
-                                className="p-0 mt-3 read-less-button-class",  # Added class for JS
-                                n_clicks=0,
-                                style={'display': 'block'}  # Visible when expanded
+                            dbc.Row(
+                                dbc.Col(
+                                    dbc.Button(
+                                        "Read Less",
+                                        id=read_less_id,
+                                        color="link",
+                                        className="p-2 w-100",  # Full width with padding
+                                        n_clicks=0,
+                                        style={
+                                            'textAlign': 'center',
+                                            'cursor': 'pointer',
+                                            'marginTop': '10px'
+                                        }
+                                    ),
+                                    width=12
+                                ),
+                                style={
+                                    'backgroundColor': '#ebedf0',
+                                    'borderTop': '1px solid #dee2e6'  # Optional: add a top border for separation
+                                }
                             )
                         ]),
                         id=collapse_id,
