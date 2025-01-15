@@ -82,7 +82,7 @@ def topics_layout():
                         [
                             html.P(
                                 [
-                                    "Note that speeches here refer only to speeches that were summarized and labelled by GPT and do not include written answers, parliamentary questions, the President's address, or speeches whose length fall outside of a pre-defined range. Topics are assigned to speeches by GPT based on a set list of topics generated using a combination of unsupervised modeling and subjective human interpretation of model outputs. This is early stage work and we are working on engineering prompts or fine tuning models to return more valid results. Please refer to the methodology for more info."
+                                    "Note that speeches here refer only to speeches that were summarized and labelled by GPT and do not include written answers, parliamentary questions, the President's address, or speeches whose length fall outside of a pre-defined range. Topics are assigned to speeches by GPT based on a set list of topics generated using a combination of unsupervised topic modeling and subjective human interpretation of model outputs. This is early stage work and we are working on engineering prompts or fine tuning models to return more valid results. Please refer to the methodology for more info."
                                 ]
                             )
                         ],
