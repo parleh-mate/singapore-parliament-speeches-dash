@@ -58,17 +58,10 @@ def methodology_layout():
 
             html.H2("Data Sourcing", id="datasourcing-method"),
             html.P([
-                "All data comes courtesy of the Singapore Parliament Hansards API. A request is made to the API at 00:00 SGT every day to check for new speeches, which are usually added to the Hansards ~2 weeks after a sitting. Data is then transformed and stored on a data warehouse. Information on the data lineage can be found on the ",
+                "All data comes courtesy of the Singapore Parliament Hansards API. A request is made to the API at 00:00 SGT every day to check for new speeches, which are usually added to the Hansards ~2 weeks after a sitting. Data is then transformed and stored on a data warehouse. Visit the ",
                 html.A(
-                    "DBT documentation page",
-                    href="https://cloud.getdbt.com/accounts/237272/jobs/506988/docs/#!/overview",  # Replace with actual URL
-                    target="_blank",  # Opens the link in a new tab
-                    style={'color': '#007bff', 'textDecoration': 'underline'}
-                ),
-                ", or visit the ",
-                html.A(
-                    "Github repository",
-                    href="https://github.com/parleh-mate",  # Replace with actual URL
+                    "DBT repository on Github",
+                    href="https://github.com/parleh-mate/singapore-parliament-speeches-dbt",
                     target="_blank",  # Opens the link in a new tab
                     style={'color': '#007bff', 'textDecoration': 'underline'}
                 ),
