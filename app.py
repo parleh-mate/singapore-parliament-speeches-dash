@@ -39,6 +39,31 @@ offcanvas = dbc.Offcanvas(
     placement="start"
 )
 
+# Define the custom index string with the meta tag
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Google Search Console Verification Meta Tag -->
+        <meta name="google-site-verification" content="0ofUVUTfiVHRVq_jhAtc74FUXixVJ9h2RVXtxURlXHM" />
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
 # App layout
 app.layout = html.Div([
     dcc.Location(id='url'),  # Tracks the URL
