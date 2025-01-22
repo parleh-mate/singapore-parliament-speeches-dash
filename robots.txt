@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://parlehmate.onrender.com/sitemap.xml

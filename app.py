@@ -2,6 +2,8 @@ from dash import html, dcc, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
 import dash
 import os
+from flask import send_from_directory, Response
+import datetime
 
 from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
@@ -12,6 +14,7 @@ from pages.topics_questions import topics_questions_callbacks, topics_questions_
 from pages.demographics import demographics_callbacks, demographics_layout
 from pages.methodology import methodology_layout
 from pages.about import about_layout
+from utils import generate_sitemap
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
@@ -21,6 +24,11 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
 app.title = 'Parleh-mate!'
 
 server = app.server  # Expose the Flask app as a variable
+
+# Route for robots.txt
+@server.route('/robots.txt')
+def robots():
+    return send_from_directory('', 'robots.txt')
 
 # Offcanvas for mobile
 offcanvas = dbc.Offcanvas(
@@ -81,6 +89,12 @@ page_outputs = {"home": Output('home-page', 'style'),
                 "methodology": Output('methodology-page', 'style'),
                 "about": Output('about-page', 'style'),
                 "404": Output('404-page', 'style')}
+
+# Flask route to serve sitemap.xml
+@server.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    sitemap_xml = generate_sitemap()
+    return Response(sitemap_xml, mimetype='application/xml')
 
 # Callback to control page visibility
 @app.callback(

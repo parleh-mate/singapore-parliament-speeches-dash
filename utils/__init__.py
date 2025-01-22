@@ -1,3 +1,7 @@
+import datetime
+from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.dom import minidom
+
 # party colors for speeches graph
 
 PARTY_COLOURS = {
@@ -104,3 +108,43 @@ bills_page_size = 10
 # policy position thresholds
 position_threshold_low = 70
 position_threshold_high = 2000
+
+# generate sitemap
+
+# site priorities
+
+sitemap_priorities = {"/": '1',
+                      "policy_positions": '0.9',
+                      "bill_summaries": '0.8',
+                      "member_metrics": '0.7',
+                      "topics_questions": '0.5',
+                      "demographics": '0.5',
+                      "methodology": '0.5',
+                      "about": '0.5',
+                      "404": '0'}
+
+urls = [{'loc': i, 'lastmod': str(datetime.datetime.now().date()),'changefreq': 'daily','priority': sitemap_priorities[i]} for i in sitemap_priorities.keys()]
+
+def generate_sitemap():
+    urlset = Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+
+    for url in urls:
+        url_element = SubElement(urlset, 'url')
+        loc = SubElement(url_element, 'loc')
+        loc.text = url['loc']
+
+        lastmod = SubElement(url_element, 'lastmod')
+        lastmod.text = url['lastmod']
+
+        changefreq = SubElement(url_element, 'changefreq')
+        changefreq.text = url['changefreq']
+
+        priority = SubElement(url_element, 'priority')
+        priority.text = url['priority']
+
+    # Pretty-print the XML
+    rough_string = tostring(urlset, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    pretty_xml = reparsed.toprettyxml(indent="  ")
+
+    return pretty_xml
