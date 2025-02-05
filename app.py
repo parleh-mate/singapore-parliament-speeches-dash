@@ -3,7 +3,6 @@ import dash_bootstrap_components as dbc
 import dash
 import os
 from flask import send_from_directory, Response
-import datetime
 
 from load_data import data
 from pages.home import home_page, navbar, sidebar_content, sidebar
@@ -49,6 +48,8 @@ app.index_string = '''
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Google Search Console Verification Meta Tag -->
         <meta name="google-site-verification" content="0ofUVUTfiVHRVq_jhAtc74FUXixVJ9h2RVXtxURlXHM" />
+        <!-- Meta Description -->
+        <meta name="description" content="Parleh-mate is an independent project that sheds light on goings-on in the Singapore Parliament. Discover policy positions, bill summaries, and more." />
         <title>{%title%}</title>
         {%favicon%}
         {%css%}
