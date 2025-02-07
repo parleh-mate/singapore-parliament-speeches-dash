@@ -17,6 +17,16 @@ def get_bill_cards(df):
         read_more_id = {'type': 'read-more-button', 'index': ind}
         read_less_id = {'type': 'read-less-button', 'index': ind}
         collapse_id = {'type': 'collapse-content', 'index': ind}
+
+        # get date passed
+        
+        if pd.isna(row.date_passed):
+            if row.bill_number in ["16/2020", "25/2012"]:
+                date_passed = "Date not avail"
+            else:
+                date_passed = "Not yet passed"
+        else:
+            date_passed = row.date_passed.strftime('%Y-%m-%d')
         
         card = dbc.Card(
             dbc.CardBody(
@@ -38,7 +48,7 @@ def get_bill_cards(df):
                                 html.H6("Date Introduced:", className="card-subtitle"),
                                 html.P(row.date_introduced.strftime('%Y-%m-%d') if pd.notna(row.date_introduced) else "N/A"),
                                 html.H6("Date Passed:", className="card-subtitle"),
-                                html.P("Not yet passed" if pd.isna(row.date_passed) else row.date_passed.strftime('%Y-%m-%d'))
+                                html.P(date_passed)
                             ]),
                             md=3,  # 3 out of 12 columns on medium to large screens
                             xs=12  # Full width on extra small screens
