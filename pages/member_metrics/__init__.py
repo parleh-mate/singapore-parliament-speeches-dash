@@ -399,7 +399,7 @@ def member_metrics_callbacks(app, data):
                         hovertext=(
                             "Member: " + plot_df['member_name'] + "<br>" +
                             "Party: " + plot_df['member_party'] + "<br>" +
-                            "Questions: " + plot_df[yaxis_var].astype(str)
+                            f"{yaxis_var.title().replace('_', ' ')}: " + plot_df[yaxis_var].astype(str)
                         ),
                         hoverinfo='text',
                         customdata=plot_df[['member_name']],  # Pass member names for hover
