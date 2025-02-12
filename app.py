@@ -39,31 +39,53 @@ offcanvas = dbc.Offcanvas(
 )
 
 # Define the custom index string with the meta tag
-app.index_string = '''
+
+page_description = "Parleh-mate is an independent project that sheds light on goings-on in the Singapore Parliament. Discover policy positions, bill summaries, and more."
+
+app.index_string = f'''
 <!DOCTYPE html>
 <html>
     <head>
-        {%metas%}
+        {{%metas%}}
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- Google Search Console Verification Meta Tag -->
         <meta name="google-site-verification" content="0ofUVUTfiVHRVq_jhAtc74FUXixVJ9h2RVXtxURlXHM" />
-        <!-- Meta Description -->
-        <meta name="description" content="Parleh-mate is an independent project that sheds light on goings-on in the Singapore Parliament. Discover policy positions, bill summaries, and more." />
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
+
+        <!-- Standard Meta Description -->
+        <meta name="description" content="{page_description}" />
+
+        <!-- Open Graph Meta Tags for Facebook, LinkedIn, etc. -->
+        <meta property="og:title" content="{{%title%}}" />
+        <meta property="og:description" content="{page_description}" />
+        <meta property="og:image" content="https://parlehmate.onrender.com/assets/favicon.png" />
+        <meta property="og:url" content="https://parlehmate.onrender.com/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Parleh-mate!" />
+
+        <!-- Twitter Card Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="{{%title%}}" />
+        <meta name="twitter:description" content="{page_description}" />
+        <meta name="twitter:image" content="https://parlehmate.onrender.com/assets/favicon.png" />
+        <meta name="twitter:url" content="https://parlehmate.onrender.com/" />
+
+        <title>{{%title%}}</title>
+        {{%favicon%}}
+        {{%css%}}
     </head>
     <body>
-        {%app_entry%}
+        {{%app_entry%}}
         <footer>
-            {%config%}
-            {%scripts%}
-            {%renderer%}
+            {{%config%}}
+            {{%scripts%}}
+            {{%renderer%}}
         </footer>
     </body>
 </html>
 '''
+
 
 # App layout
 app.layout = html.Div([
