@@ -111,9 +111,11 @@ position_threshold_high = 2000
 
 # generate sitemap
 
+base_url = "https://parlehmate.onrender.com"
+
 # site priorities
 
-sitemap_priorities = {"/": '1',
+sitemap_priorities = {"": '1',
                       "policy_positions": '0.9',
                       "bill_summaries": '0.8',
                       "member_metrics": '0.7',
@@ -131,7 +133,7 @@ def generate_sitemap():
     for url in urls:
         url_element = SubElement(urlset, 'url')
         loc = SubElement(url_element, 'loc')
-        loc.text = url['loc']
+        loc.text = base_url + '/' + url['loc']
 
         lastmod = SubElement(url_element, 'lastmod')
         lastmod.text = url['lastmod']
