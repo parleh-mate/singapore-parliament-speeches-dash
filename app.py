@@ -20,7 +20,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX,
                                                 "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
 ], suppress_callback_exceptions=True)
 
-app.title = 'Parleh-mate!'
+app.title = "Parleh-mate! | Find out what's going in in the SG Parliament"
 
 server = app.server  # Expose the Flask app as a variable
 
@@ -59,7 +59,7 @@ app.index_string = f'''
         <!-- Open Graph Meta Tags for Facebook, LinkedIn, etc. -->
         <meta property="og:title" content="{{%title%}}" />
         <meta property="og:description" content="{page_description}" />
-        <meta property="og:image" content="https://parlehmate.onrender.com/assets/favicon.png" />
+        <meta property="og:image" content="https://parlehmate.onrender.com/assets/parleh_logo_cropped.jpg" />
         <meta property="og:url" content="https://parlehmate.onrender.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Parleh-mate!" />
@@ -68,7 +68,7 @@ app.index_string = f'''
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="{{%title%}}" />
         <meta name="twitter:description" content="{page_description}" />
-        <meta name="twitter:image" content="https://parlehmate.onrender.com/assets/favicon.png" />
+        <meta name="twitter:image" content="https://parlehmate.onrender.com/assets/parleh_logo_cropped.jpg" />
         <meta name="twitter:url" content="https://parlehmate.onrender.com/" />
 
         <title>{{%title%}}</title>
