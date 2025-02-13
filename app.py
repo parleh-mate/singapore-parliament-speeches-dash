@@ -58,6 +58,7 @@ app.index_string = f'''
 
         <!-- Open Graph Meta Tags for Facebook, LinkedIn, etc. -->
         <meta property="og:title" content="{{%title%}}" />
+        <meta property="og:site_name" content="Parleh-mate!"/>
         <meta property="og:description" content="{page_description}" />
         <meta property="og:image" content="https://parlehmate.onrender.com/assets/parlehmate_logo_cropped.jpg" />
         <meta property="og:url" content="https://parlehmate.onrender.com/" />
@@ -72,6 +73,8 @@ app.index_string = f'''
         <meta name="twitter:url" content="https://parlehmate.onrender.com/" />
 
         <title>{{%title%}}</title>
+        <!-- Custom Favicon -->
+        <link rel="icon" href="https://parlehmate.onrender.com/assets/favicon.ico" />
         {{%favicon%}}
         {{%css%}}
     </head>
@@ -146,7 +149,7 @@ def sitemap():
 
 # Callback to control page visibility
 @app.callback(
-    [i for i in page_outputs.values()], 
+    [i for i in page_outputs.values()],
     [Input('url', 'pathname')]
 )
 def display_page(pathname):
