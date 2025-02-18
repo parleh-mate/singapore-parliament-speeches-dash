@@ -60,7 +60,6 @@ app.index_string = f'''
         <meta property="og:title" content="{{%title%}}" />
         <meta property="og:site_name" content="Parleh-mate!"/>
         <meta property="og:description" content="{page_description}" />
-        <meta property="og:image" content="https://parlehmate.onrender.com/assets/parlehmate_logo_cropped.jpg" />
         <meta property="og:url" content="https://parlehmate.onrender.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Parleh-mate!" />
@@ -73,9 +72,8 @@ app.index_string = f'''
         <meta name="twitter:url" content="https://parlehmate.onrender.com/" />
 
         <title>{{%title%}}</title>
-        <!-- Custom Favicon -->
-        <link rel="icon" href="https://parlehmate.onrender.com/assets/favicon.ico" />
-        {{%favicon%}}
+        <link rel="icon" type="image/x-icon" href="https://parlehmate.onrender.com/assets/favicon.ico">
+        <link rel="shortcut icon" type="image/x-icon" href="https://parlehmate.onrender.com/assets/favicon.ico">
         {{%css%}}
     </head>
     <body>
