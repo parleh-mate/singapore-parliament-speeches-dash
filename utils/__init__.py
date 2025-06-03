@@ -28,7 +28,8 @@ SIZE_MAX = 40
 parliaments = {
     "12th (2011-2015)": '12',
     "13th (2016-2020)": '13',
-    "14th (2020-present)": '14',
+    "14th (2020-2025)": '14',
+    "15th (2025-present)": '15',
     "All": 'All'
 }
 
@@ -44,7 +45,8 @@ parliaments_bills = {
 parliament_parties = {
     '12': ['NMP', 'PAP', 'PSP', 'WP'],
     '13': ['NMP', 'PAP', 'WP'],
-    '14': ['NMP', 'SPP', 'PAP', 'WP']
+    '14': ['NMP', 'SPP', 'PAP', 'WP'],
+    '15': ['NMP', 'PAP', 'WP']
 }
 
 parliament_sessions = sorted(parliaments.keys(), reverse=True)
