@@ -4,7 +4,7 @@ from dash.exceptions import PreventUpdate
 from pinecone import Pinecone
 
 from query_vectors import query_vector_embeddings, summarize_policy_positions
-from utils import parliaments, try_again_message, top_k_rag_policy_positions, policy_positions_rag_index
+from utils import parliaments, parliament_parties, try_again_message, top_k_rag_policy_positions, policy_positions_rag_index
 
 # Filter out the 'All' parliament session
 parliaments = {i: v for i, v in parliaments.items() if i != 'All'}
@@ -141,11 +141,9 @@ def policy_positions_callbacks(app, data):
         Input('parliament-dropdown-rag', 'value')
     )
     def update_party_options(selected_parliament):
-        selection_options = data['demographics']
         if selected_parliament:
-            parties = selection_options['member_party'][selection_options['parliament']==int(parliaments[selected_parliament])]
-
-            parties = sorted(parties.unique())
+            parties = parliament_parties[parliaments[selected_parliament]]
+            parties = sorted(parties)
             return parties, parties[0]
         # If no parliament selected, return empty options and no value
         return [], None
