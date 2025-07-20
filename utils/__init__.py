@@ -99,8 +99,8 @@ def get_response_format(query, uoa):
 top_k_rag_policy_positions = 10
 top_k_rag_bill_summaries = 50
 
-policy_positions_rag_index = "singapore-speeches-positions"
-bill_summaries_rag_index = "singapore-bill-summaries"
+policy_positions_rag_collection = "singapore_speeches_positions"
+bill_summaries_rag_collection = "singapore_bill_summaries"
 
 # bills page size
 bills_page_size = 10

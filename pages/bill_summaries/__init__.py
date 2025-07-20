@@ -1,14 +1,17 @@
 from dash import html, dcc, Input, Output, State, callback_context, ALL, MATCH
 import dash_bootstrap_components as dbc
+import os
 import pandas as pd
-from pinecone import Pinecone
+from pymilvus import MilvusClient
 
 from query_vectors import query_vector_embeddings
-from utils import parliaments_bills, top_k_rag_bill_summaries, bill_summaries_rag_index, bills_page_size
+from utils import parliaments_bills, top_k_rag_bill_summaries, bill_summaries_rag_collection, bills_page_size
 
-# Pinecone client
-pc = Pinecone()
-index = pc.Index(bill_summaries_rag_index)
+# zilliz client
+client = MilvusClient(
+    uri=os.environ.get("ZILLIZ_URI"),
+    token=os.environ.get("ZILLIZ_API_KEY"), 
+)
 
 def get_bill_cards(df):
     bill_cards = []
@@ -404,7 +407,7 @@ def bill_summaries_callbacks(app, data):
         # Now filter again if query was made
         if search_query:
             parliament = None if selected_parliament == "All" else int(parliaments_bills[selected_parliament])
-            responses = query_vector_embeddings(search_query, top_k_rag_bill_summaries, index, parliament=parliament, include_metadata=False)
+            responses = query_vector_embeddings(search_query, top_k_rag_bill_summaries, client, bill_summaries_rag_collection, parliament=parliament, output_field=["id"])
             bill_numbers = [i['id'] for i in responses]
             filtered_df = filtered_df[filtered_df.bill_number.isin(bill_numbers)] 
 
