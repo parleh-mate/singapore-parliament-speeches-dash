@@ -1,17 +1,20 @@
 from dash import html, dcc, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
+import os
 from dash.exceptions import PreventUpdate
-from pinecone import Pinecone
+from pymilvus import MilvusClient
 
 from query_vectors import query_vector_embeddings, summarize_policy_positions
-from utils import parliaments, try_again_message, top_k_rag_policy_positions, policy_positions_rag_index
+from utils import parliaments, try_again_message, top_k_rag_policy_positions, policy_positions_rag_collection
 
 # Filter out the 'All' parliament session
 parliaments = {i: v for i, v in parliaments.items() if i != 'All'}
 
-# pinecone client
-pc = Pinecone()
-index = pc.Index(policy_positions_rag_index)
+# zilliz client
+client = MilvusClient(
+    uri=os.environ.get("ZILLIZ_URI"),
+    token=os.environ.get("ZILLIZ_API_KEY"), 
+)
 
 # Layout for the Topic Summaries Page
 def policy_positions_layout():
@@ -298,8 +301,8 @@ def policy_positions_callbacks(app, data):
             if not query:
                 return html.P("Please enter some text before submitting.")
             try:
-                responses = query_vector_embeddings(query, top_k_rag_policy_positions, index, int(parliaments[selected_parliament]), selected_party, selected_constituency, selected_member)                
-                summaries = [i['metadata']['policy_positions'] for i in responses]
+                responses = query_vector_embeddings(query, top_k_rag_policy_positions, client, policy_positions_rag_collection, int(parliaments[selected_parliament]), selected_party, selected_constituency, selected_member, output_field=["policy_positions"])                
+                summaries = [i['entity']['policy_positions'] for i in responses]
                 # get unit of analysis
                 if selected_member:
                     uoa = 'MP'

@@ -16,7 +16,7 @@ def get_vector_from_query(query):
 
     return query_vector
 
-def query_vector_embeddings(query, top_k_rag, index, parliament, party = None, constituency = None, member = None, include_metadata = True):
+def query_vector_embeddings(query, top_k_rag, client, query_collection, parliament, party = None, constituency = None, member = None, output_field = []):
     # convert query to vector
     query_vector = get_vector_from_query(query)
 
@@ -27,19 +27,14 @@ def query_vector_embeddings(query, top_k_rag, index, parliament, party = None, c
         'name': member
     }
 
-    filters = {key: value for key, value in variables.items() if value is not None}
+    filters = " AND ".join([f"{key}=='{value}'" if isinstance(value, str) else f"{key}=={value}" for key, value in variables.items() if value is not None])
 
     # Perform a similarity search with automatic query embedding
-    response = index.query(
-        vector=query_vector,
-        top_k=top_k_rag,
-        include_metadata=include_metadata,
-        filter=filters
-    )
+    retrieved_metadata = client.search(query_collection, data=[query_vector], 
+                                       filter=filters, limit = top_k_rag, 
+                                       output_fields = output_field) 
 
-    # fetch responses
-    responses = response['matches']  
-    return responses
+    return retrieved_metadata[0]
 
 # gpt structured formats output
 
