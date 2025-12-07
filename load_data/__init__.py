@@ -2,6 +2,10 @@ from google.cloud import storage
 import pickle
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 if os.environ.get('ENVIRONMENT') == 'development':
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "tokens/gcp_token.json"
