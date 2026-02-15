@@ -5,12 +5,12 @@ from xml.dom import minidom
 # party colors for speeches graph
 
 PARTY_COLOURS = {
-    "All": '#FF964F', # pastel orange
+    "All": "#FF964F",  # pastel orange
     "PAP": "#FF9999",  # pastel red
     "PSP": "#FFFF99",  # pastel yellow
     "WP": "#99CCFF",  # pastel blue
     "NMP": "#BAFFC9",  # pastel green
-    "SPP": "#D8BFD8"  # pastel purple
+    "SPP": "#D8BFD8",  # pastel purple
 }
 
 ETHNIC_COLOURS = {
@@ -26,52 +26,53 @@ SIZE_MAX = 40
 
 # Define parliaments
 parliaments = {
-    "12th (2011-2015)": '12',
-    "13th (2016-2020)": '13',
-    "14th (2020-2025)": '14',
-    "15th (2025-present)": '15',
-    "All": 'All'
+    "12th (2011-2015)": "12",
+    "13th (2016-2020)": "13",
+    "14th (2020-2025)": "14",
+    "15th (2025-present)": "15",
+    "All": "All",
 }
 
 parliaments_bills = {
-    "10th (2002-2006)": '10',
-    "11th (2006-2011)": '11',
-    "12th (2011-2015)": '12',
-    "13th (2016-2020)": '13',
-    "14th (2020-2025)": '14',
-    "15th (2020-present)": '15',
-    "All": 'All'
+    "10th (2002-2006)": "10",
+    "11th (2006-2011)": "11",
+    "12th (2011-2015)": "12",
+    "13th (2016-2020)": "13",
+    "14th (2020-2025)": "14",
+    "15th (2020-present)": "15",
+    "All": "All",
 }
 
 parliament_parties = {
-    '12': ['NMP', 'PAP', 'PSP', 'WP'],
-    '13': ['NMP', 'PAP', 'WP'],
-    '14': ['NMP', 'SPP', 'PAP', 'WP'],
-    '15': ['NMP', 'PAP', 'WP']
+    "12": ["NMP", "PAP", "PSP", "WP"],
+    "13": ["NMP", "PAP", "WP"],
+    "14": ["NMP", "SPP", "PAP", "WP"],
+    "15": ["NMP", "PAP", "WP"],
 }
 
 parliament_sessions = sorted(parliaments.keys(), reverse=True)
 
 # member metrics options
 member_metrics_options = {
-    'speeches per sitting': 'speeches_per_sitting',
-    'words per speech': 'words_per_speech',
-    'readability score': 'readability_score',
-    'attendance': 'attendance',
-    'participation': 'participation',
-    'questions per sitting': 'questions_per_sitting'
+    "speeches per sitting": "speeches_per_sitting",
+    "words per speech": "words_per_speech",
+    "readability score": "readability_score",
+    "attendance": "attendance",
+    "participation": "participation",
+    "questions per sitting": "questions_per_sitting",
 }
 
 # query embedding model
 embedding_model = "text-embedding-3-small"
 
-summarize_policy_model = "gpt-4o"
+summarize_policy_model = "gpt-4.1-nano"
 
 # get prompts for GPT summary
 
-try_again_message = 'Your query did not return any relevant entries, please try again with something else or perhaps something less specific.'
+try_again_message = "Your query did not return any relevant entries, please try again with something else or perhaps something less specific."
 
 system_prompt = "You are a non-partisan political analyst who will take policy positions summarized from speeches (in bullet points) made by politician(s) in the Singapore parliament on a given topic and by a given party, and then output an overall summary of the party or politican's political position on the issue and policy points that support your view."
+
 
 def get_response_format(query, uoa):
 
@@ -93,9 +94,31 @@ def get_response_format(query, uoa):
     If no relevant policy positions were retrieved, return nothing.
     """
 
-    response_format = {"type": "json_schema", "json_schema": {"name": "response", "strict": True, "schema": {"type": "object", "properties": {"policy_position": {"type": "string", "description": policy_position_description}, "policy_points": {"type": "string", "description": policy_point_description}}, "required": ["policy_position", "policy_points"], "additionalProperties": False}}}
+    response_format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "response",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "policy_position": {
+                        "type": "string",
+                        "description": policy_position_description,
+                    },
+                    "policy_points": {
+                        "type": "string",
+                        "description": policy_point_description,
+                    },
+                },
+                "required": ["policy_position", "policy_points"],
+                "additionalProperties": False,
+            },
+        },
+    }
 
     return response_format
+
 
 # top k for RAG
 
@@ -118,37 +141,48 @@ base_url = "https://parlehmate.onrender.com"
 
 # site priorities
 
-sitemap_priorities = {"": '1',
-                      "policy_positions": '0.9',
-                      "bill_summaries": '0.8',
-                      "member_metrics": '0.7',
-                      "topics_questions": '0.5',
-                      "demographics": '0.5',
-                      "methodology": '0.5',
-                      "about": '0.5',
-                      "404": '0'}
+sitemap_priorities = {
+    "": "1",
+    "policy_positions": "0.9",
+    "bill_summaries": "0.8",
+    "member_metrics": "0.7",
+    "topics_questions": "0.5",
+    "demographics": "0.5",
+    "methodology": "0.5",
+    "about": "0.5",
+    "404": "0",
+}
 
-urls = [{'loc': i, 'lastmod': str(datetime.datetime.now().date()),'changefreq': 'daily','priority': sitemap_priorities[i]} for i in sitemap_priorities.keys()]
+urls = [
+    {
+        "loc": i,
+        "lastmod": str(datetime.datetime.now().date()),
+        "changefreq": "daily",
+        "priority": sitemap_priorities[i],
+    }
+    for i in sitemap_priorities.keys()
+]
+
 
 def generate_sitemap():
-    urlset = Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
     for url in urls:
-        url_element = SubElement(urlset, 'url')
-        loc = SubElement(url_element, 'loc')
-        loc.text = base_url + '/' + url['loc']
+        url_element = SubElement(urlset, "url")
+        loc = SubElement(url_element, "loc")
+        loc.text = base_url + "/" + url["loc"]
 
-        lastmod = SubElement(url_element, 'lastmod')
-        lastmod.text = url['lastmod']
+        lastmod = SubElement(url_element, "lastmod")
+        lastmod.text = url["lastmod"]
 
-        changefreq = SubElement(url_element, 'changefreq')
-        changefreq.text = url['changefreq']
+        changefreq = SubElement(url_element, "changefreq")
+        changefreq.text = url["changefreq"]
 
-        priority = SubElement(url_element, 'priority')
-        priority.text = url['priority']
+        priority = SubElement(url_element, "priority")
+        priority.text = url["priority"]
 
     # Pretty-print the XML
-    rough_string = tostring(urlset, 'utf-8')
+    rough_string = tostring(urlset, "utf-8")
     reparsed = minidom.parseString(rough_string)
     pretty_xml = reparsed.toprettyxml(indent="  ")
 
