@@ -16,5 +16,5 @@ google-cloud-storage==2.18.2
 python-dotenv==1.0.1
 pymilvus==v2.3.7
 marshmallow>=3.13,<4.0
-setuptools>=68.0.0
+setuptools>=68.0.0,<81.0.0
 
